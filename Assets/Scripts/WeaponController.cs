@@ -1,35 +1,40 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 // Controla o disparo da luva tecnológica do Agente da Vitalidade.
-// Fica anexado à Main Camera; dispara um raycast na direção da mira
-// e aplica dano a qualquer Inimigo atingido.
-namespace GuerraACaloria
+// Fica anexado à Main Camera; dispara um raycast na direção da mira,
+// aplicando a munição selecionada a qualquer IDanificavel atingido.
+// Usa o novo Input System diretamente (Mouse.current / Keyboard.current).
+public class WeaponController : MonoBehaviour
 {
-    public class WeaponController : MonoBehaviour
+    [SerializeField] private float _alcance = 100f;
+    private TipoMunicao _municaoAtual = TipoMunicao.Agua;
+
+    private void Update()
     {
-        [SerializeField] private float _alcance = 100f;
+        TrocarMunicaoPorTeclado();
 
-        private void Update()
+        if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            if (Input.GetMouseButtonDown(0)) // Verifica se o botão esquerdo do mouse foi pressionado
-            {
-                Atirar();
-            }
+            Atirar();
         }
+    }
 
-        private void Atirar()
+    private void TrocarMunicaoPorTeclado()
+    {
+        if (Keyboard.current.digit1Key.wasPressedThisFrame) _municaoAtual = TipoMunicao.Agua;
+        if (Keyboard.current.digit2Key.wasPressedThisFrame) _municaoAtual = TipoMunicao.Fruta;
+        if (Keyboard.current.digit3Key.wasPressedThisFrame) _municaoAtual = TipoMunicao.EnergiaPositiva;
+    }
+
+    private void Atirar()
+    {
+        Ray raio = new Ray(transform.position, transform.forward);
+
+        if (Physics.Raycast(raio, out RaycastHit acerto, _alcance))
         {
-            Ray raio = new Ray(transform.position, transform.forward); // Cria um raio a partir da posição da câmera na direção que ela está olhando
-
-            if(Physics.Raycast(raio, out RaycastHit acerto, _alcance)) // Verifica se o raio colidiu com algum objeto dentro do alcance
-            {
-                Inimigo inimigoAtingido = acerto.collider.GetComponent<Inimigo>(); // Tenta obter o componente Inimigo do objeto atingido
-                if (inimigoAtingido != null) // Se o objeto atingido for um inimigo
-                {
-                    inimigoAtingido.ReceberDano(); // Aplica dano ao inimigo
-                }
-            }
+            IDanificavel alvo = acerto.collider.GetComponent<IDanificavel>();
+            alvo?.ReceberDano(_municaoAtual);
         }
-
     }
 }

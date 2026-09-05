@@ -1,30 +1,31 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 // Controla a rotação da câmera em 360° a partir do movimento do mouse.
 // Fica anexado à Main Camera, dentro do objeto Player.
-
-public class MouseLook : MonoBehaviour   
+// Usa o novo Input System diretamente (Mouse.current), sem depender
+// de um asset de Input Actions configurado.
+public class MouseLook : MonoBehaviour
 {
-    [SerializeField] private float mouseSensitivity = 100f; // [SerializeField] permite que a variável seja editável no Inspector do Unity
-    private float _rotacaoX = 0f; 
+    [SerializeField] private float _sensibilidade = 0.1f;
+    private float _rotacaoX = 0f;
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked; // Bloqueia o cursor no centro da tela
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
-    private void Update() 
+    private void Update()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime; // Captura o movimento do mouse no eixo X
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime; // Captura o movimento do mouse no eixo Y
+        Vector2 delta = Mouse.current.delta.ReadValue();
 
-        _rotacaoX -= mouseY; // Inverte a rotação para que o movimento do mouse para cima faça a câmera olhar para cima
-        _rotacaoX = Mathf.Clamp(_rotacaoX, -80f, 80f); // Limita a rotação vertical entre -80 e 80 graus
+        float mouseX = delta.x * _sensibilidade;
+        float mouseY = delta.y * _sensibilidade;
 
-        transform.localRotation = Quaternion.Euler(_rotacaoX, 0f, 0f); // Aplica a rotação vertical à câmera
-        transform.parent.Rotate(Vector3.up * mouseX); // Aplica a rotação horizontal ao objeto pai (geralmente o jogador)
+        _rotacaoX -= mouseY;
+        _rotacaoX = Mathf.Clamp(_rotacaoX, -80f, 80f);
+
+        transform.localRotation = Quaternion.Euler(_rotacaoX, 0f, 0f);
+        transform.parent.Rotate(Vector3.up * mouseX);
     }
-    
-
-
 }

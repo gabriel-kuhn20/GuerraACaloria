@@ -1,35 +1,40 @@
 using UnityEngine;
 
-// Controla o disparo da luva tecnológica do Agente da Vitalidade.
-// Fica anexado à Main Camera; dispara um raycast na direção da mira
-// e aplica dano a qualquer Inimigo atingido.
-namespace GuerraACaloria
+// Gerencia o estado global do jogo: energia da cidade, e futuramente
+// onda atual e condição de vitória/derrota. Singleton acessado por
+// outros scripts via GerenciadorDeJogo.Instancia. Também serve como
+// ponto-alvo (centro da praça) para os inimigos, nesta versão da demo.
+public class GerenciadorDeJogo : MonoBehaviour
 {
-    public class WeaponController : MonoBehaviour
+    public static GerenciadorDeJogo Instancia {get; private set;} // Singleton
+
+    [SerializeField] private int _energiaMaxima = 100;  
+    private int _energiaAtual;
+
+    public int EnergiaAtual => _energiaAtual; // Propriedade de leitura para a energia atual da cidade
+
+ private void Awake()
+{
+    // Se ainda NÃO existe uma instância registrada, registra esta
+    if (Instancia == null)
     {
-        [SerializeField] private float _alcance = 100f;
+        Instancia = this;
+        _energiaAtual = _energiaMaxima;
+    }
+    else if (Instancia != this)
+    {
+        Destroy(gameObject); // Garante que não haja duplicatas do Gerenciador
+    }
+}
 
-        private void Update()
+    public void ReceberDanoNaCidade(int quantidade)
+    {
+        _energiaAtual = Mathf.Max(0, _energiaAtual - quantidade); // Reduz a energia atual, garantindo que não fique abaixo de 0
+        Debug.Log($"Energia da cidade: {_energiaAtual}/{_energiaMaxima}"); // Loga a energia atual no console
+
+                if (_energiaAtual <= 0)
         {
-            if (Input.GetMouseButtonDown(0)) // Verifica se o botão esquerdo do mouse foi pressionado
-            {
-                Atirar();
-            }
+            Debug.Log("GAME OVER");
         }
-
-        private void Atirar()
-        {
-            Ray raio = new Ray(transform.position, transform.forward); // Cria um raio a partir da posição da câmera na direção que ela está olhando
-
-            if(Physics.Raycast(raio, out RaycastHit acerto, _alcance)) // Verifica se o raio colidiu com algum objeto dentro do alcance
-            {
-                Inimigo inimigoAtingido = acerto.collider.GetComponent<Inimigo>(); // Tenta obter o componente Inimigo do objeto atingido
-                if (inimigoAtingido != null) // Se o objeto atingido for um inimigo
-                {
-                    inimigoAtingido.ReceberDano(); // Aplica dano ao inimigo
-                }
-            }
-        }
-
     }
 }
