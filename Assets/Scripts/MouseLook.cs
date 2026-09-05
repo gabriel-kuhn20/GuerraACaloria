@@ -1,5 +1,8 @@
 using UnityEngine;
 
+// Controla a rotação da câmera em 360° a partir do movimento do mouse.
+// Fica anexado à Main Camera, dentro do objeto Player.
+
 public class MouseLook : MonoBehaviour   
 {
     [SerializeField] private float mouseSensitivity = 100f; // [SerializeField] permite que a variável seja editável no Inspector do Unity
@@ -22,6 +25,6 @@ public class MouseLook : MonoBehaviour
         transform.parent.Rotate(Vector3.up * mouseX); // Aplica a rotação horizontal ao objeto pai (geralmente o jogador)
     }
     
-    
+
 
 }
