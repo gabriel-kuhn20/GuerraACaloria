@@ -317,8 +317,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14cebc2b02bcdae4680b5f4da0873a15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponController
-  _alcance: 100
   _uiManager: {fileID: 4847775}
+  _prefabProjetil: {fileID: 321055634909561923, guid: 294f0b0954c242f499d7f45e521178b1, type: 3}
+  _pontoDeDisparo: {fileID: 0}
 --- !u!114 &330585549
 MonoBehaviour:
   m_ObjectHideFlags: 0
