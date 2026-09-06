@@ -33,6 +33,11 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
         if (municaoUsada == Fraqueza)
         {
             _vida--;
+            GerenciadorDeAudio.Instancia.TocarSomAcerto();
+        }
+        else
+        {
+            GerenciadorDeAudio.Instancia.TocarSomErro();
         }
 
         if (_vida <= 0)

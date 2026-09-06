@@ -4,10 +4,11 @@ using UnityEngine.InputSystem;
 // Controla o disparo da luva tecnológica do Agente da Vitalidade.
 // Fica anexado à Main Camera; dispara um raycast na direção da mira,
 // aplicando a munição selecionada a qualquer IDanificavel atingido.
+// Versão temporária com raycast — o Projetil visual fica pendente.
 public class WeaponController : MonoBehaviour
 {
-    [SerializeField] private float _alcance = 100f;
     [SerializeField] private UIManager _uiManager;
+    [SerializeField] private float _alcance = 100f;
     private TipoMunicao _municaoAtual = TipoMunicao.Agua;
 
     private void Start()
@@ -47,5 +48,7 @@ public class WeaponController : MonoBehaviour
             IDanificavel alvo = acerto.collider.GetComponent<IDanificavel>();
             alvo?.ReceberDano(_municaoAtual);
         }
+
+        GerenciadorDeAudio.Instancia.TocarSomTiro();
     }
 }

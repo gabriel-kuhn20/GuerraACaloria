@@ -28,6 +28,7 @@ public class GerenciadorDeJogo : MonoBehaviour
         if (_jogoAcabou) return;
 
         _energiaAtual = Mathf.Max(0, _energiaAtual - quantidade);
+        GerenciadorDeAudio.Instancia.TocarSomAlarme();
 
         if (_energiaAtual <= 0)
         {
