@@ -17,6 +17,8 @@ public class MouseLook : MonoBehaviour
 
     private void Update()
     {
+        if (Time.timeScale == 0f) return;
+
         Vector2 delta = Mouse.current.delta.ReadValue();
 
         float mouseX = delta.x * _sensibilidade;

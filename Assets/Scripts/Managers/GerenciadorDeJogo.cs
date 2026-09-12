@@ -15,6 +15,7 @@ public class GerenciadorDeJogo : MonoBehaviour
 
     public int EnergiaAtual => _energiaAtual;
     public event Action AoPerderJogo;
+    public event Action AoReceberDano;
 
     private void Awake()
     {
@@ -29,6 +30,7 @@ public class GerenciadorDeJogo : MonoBehaviour
 
         _energiaAtual = Mathf.Max(0, _energiaAtual - quantidade);
         GerenciadorDeAudio.Instancia.TocarSomAlarme();
+        AoReceberDano?.Invoke();
 
         if (_energiaAtual <= 0)
         {

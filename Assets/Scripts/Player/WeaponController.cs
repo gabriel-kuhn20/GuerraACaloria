@@ -18,6 +18,8 @@ public class WeaponController : MonoBehaviour
 
     private void Update()
     {
+        if (Time.timeScale == 0f) return;
+
         TrocarMunicaoPorTeclado();
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
