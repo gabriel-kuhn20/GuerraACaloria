@@ -38,7 +38,7 @@ public class UIManager : MonoBehaviour
     {   
         if(!_barraDeEnergia.gameObject.activeSelf)
         {
-        _barraDeEnergia.gameObject.SetActive(true);
+            _barraDeEnergia.gameObject.SetActive(true);
         }
         _tempoRestanteVisivel = _duracaoVisivelAposDano;
     }

@@ -40,4 +40,9 @@ public class GerenciadorDeAudio : MonoBehaviour
     {
         _audioSource.PlayOneShot(_somAlarme);
     }
+
+    public void PararTodosOsSons()
+    {
+        _audioSource.Stop();
+    }
 }

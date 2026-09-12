@@ -35,7 +35,23 @@ public class GerenciadorDeJogo : MonoBehaviour
         if (_energiaAtual <= 0)
         {
             _jogoAcabou = true;
-            AoPerderJogo?.Invoke();
+            EncerrarJogo();
+        }
+    }
+
+    private void EncerrarJogo()
+    {
+        GerenciadorDeAudio.Instancia.PararTodosOsSons();
+        DestruirProjeteisRestantes();
+        AoPerderJogo?.Invoke();
+    }
+
+    private void DestruirProjeteisRestantes()
+    {
+        Projetil[] projeteis = FindObjectsByType<Projetil>(FindObjectsSortMode.None);
+        foreach (Projetil projetil in projeteis)
+        {
+            Destroy(projetil.gameObject);
         }
     }
 }
