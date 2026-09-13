@@ -68,8 +68,9 @@ public class GeradorDeInimigos : MonoBehaviour
     private Vector3 PosicaoAleatoriaNaBorda()
     {
         float angulo = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
-        float x = Mathf.Cos(angulo) * _raioDeSpawn;
-        float z = Mathf.Sin(angulo) * _raioDeSpawn;
+        float raioVariado = _raioDeSpawn + UnityEngine.Random.Range(-3f, 3f);
+        float x = Mathf.Cos(angulo) * raioVariado;
+        float z = Mathf.Sin(angulo) * raioVariado;
         return new Vector3(x, 1f, z);
     }
 }
