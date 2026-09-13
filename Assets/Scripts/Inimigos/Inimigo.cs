@@ -5,7 +5,8 @@ using System;
 // Persegue o cidadão vivo mais próximo (recalculado periodicamente,
 // não todo frame); ao alcançá-lo, causa dano à energia da cidade.
 // Movimento tem uma leve oscilação lateral individual, para parecer
-// menos robótico e mais orgânico.
+// menos robótico e mais orgânico. Mantém sempre a própria altura,
+// ignorando a altura do alvo (evita afundar no chão ao se aproximar).
 public abstract class Inimigo : MonoBehaviour, IDanificavel
 {
     [SerializeField] protected float _velocidade = 2f;
@@ -18,6 +19,7 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
     private bool _jaNotificouMorte = false;
     private float _deslocamentoAleatorio;
     private float _velocidadeOscilacao;
+    private float _alturaFixa;
 
     public abstract TipoMunicao Fraqueza { get; }
     public event Action AoMorrer;
@@ -28,6 +30,11 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
         _velocidadeOscilacao = UnityEngine.Random.Range(1.5f, 3f);
     }
 
+    protected virtual void Start()
+    {
+        _alturaFixa = transform.position.y;
+    }
+
     protected virtual void Update()
     {
         AtualizarAlvoPeriodicamente();
@@ -35,8 +42,9 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
         if (_alvo == null) return;
 
         MoverEmDirecaoAoAlvoComOscilacao();
+        ManterAlturaFixa();
 
-        if (Vector3.Distance(transform.position, _alvo.position) < 1f)
+        if (DistanciaHorizontalAteAlvo() < 1f)
         {
             GerenciadorDeJogo.Instancia.ReceberDanoNaCidade(10);
             NotificarMorteEDestruir();
@@ -45,13 +53,28 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
 
     private void MoverEmDirecaoAoAlvoComOscilacao()
     {
-        Vector3 direcaoAoAlvo = (_alvo.position - transform.position).normalized;
+        Vector3 posicaoAlvoMesmaAltura = new Vector3(_alvo.position.x, transform.position.y, _alvo.position.z);
+        Vector3 direcaoAoAlvo = (posicaoAlvoMesmaAltura - transform.position).normalized;
         Vector3 lateral = Vector3.Cross(Vector3.up, direcaoAoAlvo);
 
         float oscilacao = Mathf.Sin(Time.time * _velocidadeOscilacao + _deslocamentoAleatorio) * _amplitudeOscilacao;
 
         Vector3 movimento = (direcaoAoAlvo * _velocidade) + (lateral * oscilacao);
         transform.position += movimento * Time.deltaTime;
+    }
+
+    private void ManterAlturaFixa()
+    {
+        Vector3 posicao = transform.position;
+        posicao.y = _alturaFixa;
+        transform.position = posicao;
+    }
+
+    private float DistanciaHorizontalAteAlvo()
+    {
+        Vector3 posicaoAtualSemAltura = new Vector3(transform.position.x, 0f, transform.position.z);
+        Vector3 posicaoAlvoSemAltura = new Vector3(_alvo.position.x, 0f, _alvo.position.z);
+        return Vector3.Distance(posicaoAtualSemAltura, posicaoAlvoSemAltura);
     }
 
     private void AtualizarAlvoPeriodicamente()
