@@ -4,14 +4,15 @@ using TMPro;
 using UnityEngine.SceneManagement;
 
 // Atualiza os elementos visuais do HUD: barra de energia da cidade,
-// indicador de munição atual e tela de Game Over. A barra de energia
-// só fica visível por alguns segundos após dano recente.
+// indicador de munição atual, número da onda e tela de Game Over.
 public class UIManager : MonoBehaviour
 {
     [SerializeField] private Slider _barraDeEnergia;
     [SerializeField] private TextMeshProUGUI _textoMunicao;
+    [SerializeField] private TextMeshProUGUI _textoOnda;
     [SerializeField] private GameObject _telaGameOver;
     [SerializeField] private GameObject _crosshair;
+    [SerializeField] private GeradorDeInimigos _geradorDeInimigos;
     [SerializeField] private float _duracaoVisivelAposDano = 3f;
 
     private float _tempoRestanteVisivel;
@@ -20,6 +21,8 @@ public class UIManager : MonoBehaviour
     {
         GerenciadorDeJogo.Instancia.AoPerderJogo += MostrarTelaGameOver;
         GerenciadorDeJogo.Instancia.AoReceberDano += MostrarBarraTemporariamente;
+        _geradorDeInimigos.AoMudarDeOnda += AtualizarTextoOnda;
+        _barraDeEnergia.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -35,11 +38,8 @@ public class UIManager : MonoBehaviour
     }
 
     private void MostrarBarraTemporariamente()
-    {   
-        if(!_barraDeEnergia.gameObject.activeSelf)
-        {
-            _barraDeEnergia.gameObject.SetActive(true);
-        }
+    {
+        _barraDeEnergia.gameObject.SetActive(true);
         _tempoRestanteVisivel = _duracaoVisivelAposDano;
     }
 
@@ -59,12 +59,16 @@ public class UIManager : MonoBehaviour
         _textoMunicao.text = $"Munição: {municaoAtual}";
     }
 
+    private void AtualizarTextoOnda(int numeroDaOnda)
+    {
+        _textoOnda.text = $"Onda: {numeroDaOnda}";
+    }
+
     private void MostrarTelaGameOver()
     {
         _telaGameOver.SetActive(true);
         _textoMunicao.gameObject.SetActive(false);
         _crosshair.SetActive(false);
-        _barraDeEnergia.gameObject.SetActive(false);
         Cursor.lockState = CursorLockMode.None;
         Time.timeScale = 0f;
     }

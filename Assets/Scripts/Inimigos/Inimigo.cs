@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 // Classe base de todo inimigo do jogo (nuvens de maus hábitos).
 // Persegue o cidadão vivo mais próximo (recalculado periodicamente,
@@ -11,8 +12,10 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
 
     private Transform _alvo;
     private float _proximaBusca;
+    private bool _jaNotificouMorte = false;
 
     public abstract TipoMunicao Fraqueza { get; }
+    public event Action AoMorrer;
 
     protected virtual void Update()
     {
@@ -26,7 +29,7 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
         if (Vector3.Distance(transform.position, _alvo.position) < 1f)
         {
             GerenciadorDeJogo.Instancia.ReceberDanoNaCidade(10);
-            Destroy(gameObject);
+            NotificarMorteEDestruir();
         }
     }
 
@@ -52,12 +55,16 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
 
         if (_vida <= 0)
         {
-            Morrer();
+            NotificarMorteEDestruir();
         }
     }
 
-    protected virtual void Morrer()
+    private void NotificarMorteEDestruir()
     {
+        if (_jaNotificouMorte) return;
+        _jaNotificouMorte = true;
+
+        AoMorrer?.Invoke();
         Destroy(gameObject);
     }
 }

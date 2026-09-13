@@ -1,36 +1,73 @@
 using UnityEngine;
+using System;
+using System.Collections;
 
-// Responsável por spawnar inimigos periodicamente em pontos aleatórios
-// na borda da praça, alternando entre os 3 tipos disponíveis.
-// Versão inicial da demo: spawn contínuo simples, ainda sem sistema
-// de ondas com dificuldade progressiva.
+// Gerencia a progressão de ondas: spawna inimigos conforme a configuração
+// da onda atual e avança para a próxima quando todos os inimigos daquela
+// onda são derrotados ou passam do tempo de spawn.
 public class GeradorDeInimigos : MonoBehaviour
 {
     [SerializeField] private GameObject[] _prefabsDeInimigo;
-    [SerializeField] private float _intervaloEntreSpawns = 2f;
     [SerializeField] private float _raioDeSpawn = 15f;
+    [SerializeField] private ConfiguracaoDeOnda[] _ondas;
 
-    private float _proximoSpawn;
+    private int _ondaAtual = 0;
+    private int _inimigosRestantesNaOnda;
 
-    private void Update()
+    public event Action<int> AoMudarDeOnda;
+
+    private void Start()
     {
-        if (Time.time >= _proximoSpawn)
+        IniciarProximaOnda();
+    }
+
+    private void IniciarProximaOnda()
+    {
+        if (_ondaAtual >= _ondas.Length)
+        {
+            return;
+        }
+
+        AoMudarDeOnda?.Invoke(_ondaAtual + 1);
+        _inimigosRestantesNaOnda = _ondas[_ondaAtual].quantidadeDeInimigos;
+        StartCoroutine(SpawnarOnda());
+    }
+
+    private IEnumerator SpawnarOnda()
+    {
+        ConfiguracaoDeOnda onda = _ondas[_ondaAtual];
+
+        for (int i = 0; i < onda.quantidadeDeInimigos; i++)
         {
             SpawnarInimigo();
-            _proximoSpawn = Time.time + _intervaloEntreSpawns;
+            yield return new WaitForSeconds(onda.intervaloEntreSpawns);
         }
     }
 
     private void SpawnarInimigo()
     {
         Vector3 posicao = PosicaoAleatoriaNaBorda();
-        GameObject prefabEscolhido = _prefabsDeInimigo[Random.Range(0, _prefabsDeInimigo.Length)];
-        Instantiate(prefabEscolhido, posicao, Quaternion.identity);
+        GameObject prefabEscolhido = _prefabsDeInimigo[UnityEngine.Random.Range(0, _prefabsDeInimigo.Length)];
+        GameObject inimigoCriado = Instantiate(prefabEscolhido, posicao, Quaternion.identity);
+
+        Inimigo inimigo = inimigoCriado.GetComponent<Inimigo>();
+        inimigo.AoMorrer += RegistrarDerrota;
+    }
+
+    private void RegistrarDerrota()
+    {
+        _inimigosRestantesNaOnda--;
+
+        if (_inimigosRestantesNaOnda <= 0)
+        {
+            _ondaAtual++;
+            IniciarProximaOnda();
+        }
     }
 
     private Vector3 PosicaoAleatoriaNaBorda()
     {
-        float angulo = Random.Range(0f, Mathf.PI * 2f);
+        float angulo = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
         float x = Mathf.Cos(angulo) * _raioDeSpawn;
         float z = Mathf.Sin(angulo) * _raioDeSpawn;
         return new Vector3(x, 1f, z);
