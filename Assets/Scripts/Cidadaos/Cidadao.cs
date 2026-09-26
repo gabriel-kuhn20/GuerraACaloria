@@ -1,20 +1,19 @@
 using UnityEngine;
 
 // Representa um cidadão da praça, alvo perseguido pelos inimigos.
-// Por padrão anda em patrulha aleatória (com pausas naturais); ao detectar
-// um inimigo próximo, foge diretamente na direção oposta, sem pausar,
-// até o inimigo se afastar o suficiente. Mantém sempre a própria altura,
-// ignorando a altura do inimigo/destino (evita afundar no chão).
+// Patrulha dentro de uma zona fixa, definida a partir da posição inicial
+// do jogador (atrás dele, no sentido oposto de onde os inimigos nascem).
+// Foge de inimigos próximos. Mantém sempre a própria altura.
 public class Cidadao : MonoBehaviour
 {
     [SerializeField] private float _velocidade = 1.5f;
     [SerializeField] private float _velocidadeDeFuga = 4f;
-    [SerializeField] private float _raioDePatrulha = 8f;
+    [SerializeField] private float _raioDePatrulha = 6f;
     [SerializeField] private float _distanciaParaNovoDestino = 0.5f;
     [SerializeField] private float _velocidadeDeGiro = 4f;
     [SerializeField] private float _raioDeDeteccaoDeInimigo = 5f;
+    [SerializeField] private Transform _centroDaZonaDePatrulha;
 
-    private Vector3 _posicaoInicial;
     private Vector3 _destinoAtual;
     private float _raioIndividual;
     private float _velocidadeIndividual;
@@ -34,7 +33,6 @@ public class Cidadao : MonoBehaviour
 
     private void Start()
     {
-        _posicaoInicial = transform.position;
         _alturaFixa = transform.position.y;
         _raioIndividual = _raioDePatrulha * Random.Range(0.7f, 1.3f);
         _velocidadeIndividual = _velocidade * Random.Range(0.8f, 1.2f);
@@ -57,6 +55,7 @@ public class Cidadao : MonoBehaviour
         }
 
         ManterAlturaFixa();
+        transform.position = GerenciadorDeRua.Instancia.RestringirPosicao(transform.position);
     }
 
     private void AtualizarInimigoMaisProximo()
@@ -107,16 +106,17 @@ public class Cidadao : MonoBehaviour
 
     private void GirarSuavementePara(Vector3 direcao)
     {
-        if (direcao == Vector3.zero) return;
+        direcao.y = 0f; // evita olhar pro céu/chão ao seguir alvo em altura diferente
+        if (direcao.sqrMagnitude < 0.0001f) return;
 
         Quaternion rotacaoAlvo = Quaternion.LookRotation(direcao);
         transform.rotation = Quaternion.Slerp(transform.rotation, rotacaoAlvo, _velocidadeDeGiro * Time.deltaTime);
     }
-
     private void EscolherNovoDestino()
     {
+        Vector3 centro = _centroDaZonaDePatrulha != null ? _centroDaZonaDePatrulha.position : transform.position;
         Vector2 pontoAleatorio = Random.insideUnitCircle * _raioIndividual;
-        _destinoAtual = _posicaoInicial + new Vector3(pontoAleatorio.x, 0f, pontoAleatorio.y);
+        _destinoAtual = centro + new Vector3(pontoAleatorio.x, 0f, pontoAleatorio.y);
     }
 
     private void ManterAlturaFixa()

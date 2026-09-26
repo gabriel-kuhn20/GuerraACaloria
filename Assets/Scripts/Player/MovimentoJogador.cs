@@ -1,9 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Controla o movimento livre do Agente da Vitalidade pela praça (WASD).
-// Fica anexado ao objeto Player (pai da Main Camera). Usa CharacterController
-// para movimento simples com colisão, sem precisar de física complexa.
+// Controla o movimento livre do Agente da Vitalidade pela rua (WASD),
+// restrito aos limites definidos pelo GerenciadorDeRua.
 [RequireComponent(typeof(CharacterController))]
 public class MovimentoJogador : MonoBehaviour
 {
@@ -22,6 +21,20 @@ public class MovimentoJogador : MonoBehaviour
         Vector2 entrada = ObterEntradaMovimento();
         Vector3 direcao = (transform.right * entrada.x + transform.forward * entrada.y).normalized;
         _controller.Move(direcao * _velocidade * Time.deltaTime);
+
+        RestringirNaRua();
+    }
+
+    private void RestringirNaRua()
+    {
+        Vector3 posicaoRestringida = GerenciadorDeRua.Instancia.RestringirPosicao(transform.position);
+
+        if (posicaoRestringida != transform.position)
+        {
+            _controller.enabled = false;
+            transform.position = posicaoRestringida;
+            _controller.enabled = true;
+        }
     }
 
     private Vector2 ObterEntradaMovimento()

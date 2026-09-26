@@ -4,14 +4,15 @@ using System;
 // Classe base de todo inimigo do jogo (nuvens de maus hábitos).
 // Persegue o cidadão vivo mais próximo (recalculado periodicamente,
 // não todo frame); ao alcançá-lo, causa dano à energia da cidade.
-// Movimento tem uma leve oscilação lateral individual, para parecer
-// menos robótico e mais orgânico. Mantém sempre a própria altura,
-// ignorando a altura do alvo (evita afundar no chão ao se aproximar).
+// Velocidade, dano e oscilação são definidos por cada subclasse,
+// dando personalidade própria a cada tipo de inimigo.
 public abstract class Inimigo : MonoBehaviour, IDanificavel
 {
-    [SerializeField] protected float _velocidade = 2f;
+    protected virtual float Velocidade => 3f;
+    protected virtual int DanoAoAlcancarAlvo => 10;
+    protected virtual float AmplitudeOscilacao => 0.6f;
+
     [SerializeField] private float _intervaloBuscaAlvo = 0.5f;
-    [SerializeField] private float _amplitudeOscilacao = 0.6f;
     protected int _vida = 1;
 
     private Transform _alvo;
@@ -43,10 +44,11 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
 
         MoverEmDirecaoAoAlvoComOscilacao();
         ManterAlturaFixa();
+        transform.position = GerenciadorDeRua.Instancia.RestringirPosicao(transform.position);
 
         if (DistanciaHorizontalAteAlvo() < 1f)
         {
-            GerenciadorDeJogo.Instancia.ReceberDanoNaCidade(10);
+            GerenciadorDeJogo.Instancia.ReceberDanoNaCidade(DanoAoAlcancarAlvo);
             NotificarMorteEDestruir();
         }
     }
@@ -57,9 +59,9 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
         Vector3 direcaoAoAlvo = (posicaoAlvoMesmaAltura - transform.position).normalized;
         Vector3 lateral = Vector3.Cross(Vector3.up, direcaoAoAlvo);
 
-        float oscilacao = Mathf.Sin(Time.time * _velocidadeOscilacao + _deslocamentoAleatorio) * _amplitudeOscilacao;
+        float oscilacao = Mathf.Sin(Time.time * _velocidadeOscilacao + _deslocamentoAleatorio) * AmplitudeOscilacao;
 
-        Vector3 movimento = (direcaoAoAlvo * _velocidade) + (lateral * oscilacao);
+        Vector3 movimento = (direcaoAoAlvo * Velocidade) + (lateral * oscilacao);
         transform.position += movimento * Time.deltaTime;
     }
 

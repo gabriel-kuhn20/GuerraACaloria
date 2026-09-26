@@ -2,14 +2,17 @@ using UnityEngine;
 using System;
 using System.Collections;
 
-// Gerencia a progressão de ondas: spawna inimigos conforme a configuração
-// da onda atual e avança para a próxima quando todos os inimigos daquela
-// onda são derrotados ou passam do tempo de spawn.
+// Gerencia a progressão de ondas: spawna inimigos em grupos (rajadas),
+// sempre à frente do jogador (dentro de um arco), conforme a
+// configuração da onda atual.
 public class GeradorDeInimigos : MonoBehaviour
 {
     [SerializeField] private GameObject[] _prefabsDeInimigo;
-    [SerializeField] private float _raioDeSpawn = 15f;
+    [SerializeField] private Transform _jogador;
+    [SerializeField] private float _distanciaDeSpawn = 20f;
+    [SerializeField] private float _anguloDeVariacao = 30f;
     [SerializeField] private ConfiguracaoDeOnda[] _ondas;
+    [SerializeField] private int _inimigosPorRajada = 3;
 
     private int _ondaAtual = 0;
     private int _inimigosRestantesNaOnda;
@@ -36,22 +39,41 @@ public class GeradorDeInimigos : MonoBehaviour
     private IEnumerator SpawnarOnda()
     {
         ConfiguracaoDeOnda onda = _ondas[_ondaAtual];
+        int inimigosSpawnados = 0;
 
-        for (int i = 0; i < onda.quantidadeDeInimigos; i++)
+        while (inimigosSpawnados < onda.quantidadeDeInimigos)
         {
-            SpawnarInimigo();
+            int quantidadeNestaRajada = Mathf.Min(_inimigosPorRajada, onda.quantidadeDeInimigos - inimigosSpawnados);
+
+            for (int i = 0; i < quantidadeNestaRajada; i++)
+            {
+                SpawnarInimigo();
+                inimigosSpawnados++;
+            }
+
             yield return new WaitForSeconds(onda.intervaloEntreSpawns);
         }
     }
 
     private void SpawnarInimigo()
     {
-        Vector3 posicao = PosicaoAleatoriaNaBorda();
+        Vector3 posicao = PosicaoAleatoriaAFrenteDoJogador();
         GameObject prefabEscolhido = _prefabsDeInimigo[UnityEngine.Random.Range(0, _prefabsDeInimigo.Length)];
         GameObject inimigoCriado = Instantiate(prefabEscolhido, posicao, Quaternion.identity);
 
         Inimigo inimigo = inimigoCriado.GetComponent<Inimigo>();
         inimigo.AoMorrer += RegistrarDerrota;
+    }
+
+    private Vector3 PosicaoAleatoriaAFrenteDoJogador()
+    {
+        float anguloAleatorio = UnityEngine.Random.Range(-_anguloDeVariacao, _anguloDeVariacao);
+        Quaternion rotacao = Quaternion.Euler(0f, anguloAleatorio, 0f);
+        Vector3 direcaoAFrente = rotacao * _jogador.forward;
+
+        Vector3 posicao = _jogador.position + direcaoAFrente * _distanciaDeSpawn;
+        posicao.y = 1f;
+        return posicao;
     }
 
     private void RegistrarDerrota()
@@ -63,14 +85,5 @@ public class GeradorDeInimigos : MonoBehaviour
             _ondaAtual++;
             IniciarProximaOnda();
         }
-    }
-
-    private Vector3 PosicaoAleatoriaNaBorda()
-    {
-        float angulo = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
-        float raioVariado = _raioDeSpawn + UnityEngine.Random.Range(-3f, 3f);
-        float x = Mathf.Cos(angulo) * raioVariado;
-        float z = Mathf.Sin(angulo) * raioVariado;
-        return new Vector3(x, 1f, z);
     }
 }

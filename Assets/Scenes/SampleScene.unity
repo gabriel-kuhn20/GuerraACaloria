@@ -457,7 +457,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: de32b7a4122d6c241a84f739e2cd580f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1
+      value: -0.33
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: de32b7a4122d6c241a84f739e2cd580f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -465,7 +465,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: de32b7a4122d6c241a84f739e2cd580f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1
+      value: -31.76
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: de32b7a4122d6c241a84f739e2cd580f, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1640,7 +1640,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 81f021ebe46283b4db2f927c6b667bd0, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 3
+      value: -33.06
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 81f021ebe46283b4db2f927c6b667bd0, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1673,6 +1673,14 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 81f021ebe46283b4db2f927c6b667bd0, type: 3}
       propertyPath: m_Name
       value: Male_Suit
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730954087121689078, guid: 81f021ebe46283b4db2f927c6b667bd0, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7730954087121689078, guid: 81f021ebe46283b4db2f927c6b667bd0, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.58
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3370,11 +3378,14 @@ MonoBehaviour:
   - {fileID: 469878368535577484, guid: dc2d77e880e27e049978f25270f7943c, type: 3}
   - {fileID: 469878368535577484, guid: 0f178235c6931ee49a48a2183adb99bf, type: 3}
   - {fileID: 469878368535577484, guid: 27e2d5a6937da07469022b200c40c089, type: 3}
-  _raioDeSpawn: 15
+  _jogador: {fileID: 1573670327}
+  _distanciaDeSpawn: 20
+  _anguloDeVariacao: 30
   _ondas:
   - {fileID: 11400000, guid: b7946ef3946a4e248a28c877880eb809, type: 2}
   - {fileID: 11400000, guid: af34ddf6d31dc85498ece5407c3ef2e7, type: 2}
   - {fileID: 11400000, guid: e67b4ef39ea951b41ac927c3cfe8dcc2, type: 2}
+  _inimigosPorRajada: 3
 --- !u!1001 &378075295
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4281,6 +4292,7 @@ Transform:
   - {fileID: 703253201}
   - {fileID: 376734806}
   - {fileID: 9125586}
+  - {fileID: 637882738}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &451700539
@@ -4842,9 +4854,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f8a10336551f1e42a0c22f3704d9200, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cidadao
-  _velocidade: 1.5
+  _velocidade: 4
+  _velocidadeDeFuga: 4
   _raioDePatrulha: 8
   _distanciaParaNovoDestino: 0.5
+  _velocidadeDeGiro: 4
+  _raioDeDeteccaoDeInimigo: 5
+  _centroDaZonaDePatrulha: {fileID: 1801104061}
 --- !u!1 &525514317
 GameObject:
   m_ObjectHideFlags: 0
@@ -4977,6 +4993,7 @@ Transform:
   - {fileID: 1658345778}
   - {fileID: 1904969261}
   - {fileID: 524020853}
+  - {fileID: 1801104061}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &538729971
@@ -5580,7 +5597,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 912d43a820f66894cb1e5b265eebd5ec, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -34.03
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 912d43a820f66894cb1e5b265eebd5ec, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5757,6 +5774,53 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2722735462829109436, guid: ccab6c8306a6dae4d9688eb372e59639, type: 3}
   m_PrefabInstance: {fileID: 628033397}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &637882737
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 637882738}
+  - component: {fileID: 637882739}
+  m_Layer: 0
+  m_Name: GerenciadorDeRua
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &637882738
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 637882737}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.4, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 445018723}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &637882739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 637882737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbd47b041c331ca4dadd8cd8901d9f93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GerenciadorDeRua
+  _largura: 12
+  _comprimento: 140
+  _centro: {x: -0.4, y: 0, z: 30}
 --- !u!1001 &651380404
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6408,6 +6472,8 @@ MonoBehaviour:
   _somAcerto: {fileID: 8300000, guid: 177a511ddc23da846ace61a158511ccd, type: 3}
   _somErro: {fileID: 8300000, guid: 82d3f5b9176e2724f82d84b5e38d2046, type: 3}
   _somAlarme: {fileID: 8300000, guid: 547fa88e11cc71d41aa3a1a0ecc99b7c, type: 3}
+  _musicaDeFundo: {fileID: 8300000, guid: acf81b8f24804074fb560c32ae5d653b, type: 3}
+  _volumeMusica: 0.5
 --- !u!82 &703253203
 AudioSource:
   m_ObjectHideFlags: 0
@@ -8949,9 +9015,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f8a10336551f1e42a0c22f3704d9200, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cidadao
-  _velocidade: 1.5
+  _velocidade: 4
+  _velocidadeDeFuga: 4
   _raioDePatrulha: 8
   _distanciaParaNovoDestino: 0.5
+  _velocidadeDeGiro: 4
+  _raioDeDeteccaoDeInimigo: 5
+  _centroDaZonaDePatrulha: {fileID: 1801104061}
 --- !u!95 &945576470
 Animator:
   serializedVersion: 7
@@ -10014,7 +10084,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c6e42f875e37eac458564a951f27b967, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 4
+      value: -32.02
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c6e42f875e37eac458564a951f27b967, type: 3}
       propertyPath: m_LocalRotation.w
@@ -13739,7 +13809,7 @@ Transform:
   m_GameObject: {fileID: 1573670326}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.7, z: 0}
+  m_LocalPosition: {x: 0, y: 1.7, z: -21.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -14795,9 +14865,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f8a10336551f1e42a0c22f3704d9200, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cidadao
-  _velocidade: 1.5
+  _velocidade: 4
+  _velocidadeDeFuga: 4
   _raioDePatrulha: 8
   _distanciaParaNovoDestino: 0.5
+  _velocidadeDeGiro: 4
+  _raioDeDeteccaoDeInimigo: 5
+  _centroDaZonaDePatrulha: {fileID: 1801104061}
 --- !u!95 &1658345780
 Animator:
   serializedVersion: 7
@@ -15710,6 +15784,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6279272187601660846, guid: 98b984cd8eaf1ef4d8625a892ba0830b, type: 3}
   m_PrefabInstance: {fileID: 1785428114}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1801104060
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1801104061}
+  m_Layer: 0
+  m_Name: CentroZonaCidadaos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1801104061
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1801104060}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.7, z: -31.9}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 529708594}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1814216937
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16196,9 +16301,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f8a10336551f1e42a0c22f3704d9200, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cidadao
-  _velocidade: 1.5
+  _velocidade: 4
+  _velocidadeDeFuga: 4
   _raioDePatrulha: 8
   _distanciaParaNovoDestino: 0.5
+  _velocidadeDeGiro: 4
+  _raioDeDeteccaoDeInimigo: 5
+  _centroDaZonaDePatrulha: {fileID: 1801104061}
 --- !u!95 &1904969263
 Animator:
   serializedVersion: 7
@@ -18138,6 +18247,7 @@ MonoBehaviour:
   _textoOnda: {fileID: 1244815624}
   _telaGameOver: {fileID: 400903881}
   _crosshair: {fileID: 1432669801}
+  _geradorDeInimigos: {fileID: 376734807}
   _duracaoVisivelAposDano: 3
 --- !u!1001 &2107175742
 PrefabInstance:
