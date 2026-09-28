@@ -4,8 +4,8 @@ using System;
 // Classe base de todo inimigo do jogo (nuvens de maus hábitos).
 // Persegue o cidadão vivo mais próximo (recalculado periodicamente,
 // não todo frame); ao alcançá-lo, causa dano à energia da cidade.
-// Velocidade, dano e oscilação são definidos por cada subclasse,
-// dando personalidade própria a cada tipo de inimigo.
+// O cálculo do vetor de movimento é virtual — cada subclasse pode
+// sobrescrever para ter um padrão de movimento único.
 public abstract class Inimigo : MonoBehaviour, IDanificavel
 {
     protected virtual float Velocidade => 3f;
@@ -15,11 +15,11 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
     [SerializeField] private float _intervaloBuscaAlvo = 0.5f;
     protected int _vida = 1;
 
-    private Transform _alvo;
+    protected Transform _alvo;
     private float _proximaBusca;
     private bool _jaNotificouMorte = false;
-    private float _deslocamentoAleatorio;
-    private float _velocidadeOscilacao;
+    protected float _deslocamentoAleatorio;
+    protected float _velocidadeOscilacao;
     private float _alturaFixa;
 
     public abstract TipoMunicao Fraqueza { get; }
@@ -42,8 +42,8 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
 
         if (_alvo == null) return;
 
-        MoverEmDirecaoAoAlvoComOscilacao();
-        ManterAlturaFixa();
+        AplicarMovimento();
+        AplicarAlturaFinal();
         transform.position = GerenciadorDeRua.Instancia.RestringirPosicao(transform.position);
 
         if (DistanciaHorizontalAteAlvo() < 1f)
@@ -53,26 +53,37 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
         }
     }
 
-    private void MoverEmDirecaoAoAlvoComOscilacao()
+    // Ponto de extensão principal: calcula e aplica o deslocamento deste
+    // frame. Implementação padrão: linha reta ao alvo + oscilação lateral.
+    protected virtual void AplicarMovimento()
     {
-        Vector3 posicaoAlvoMesmaAltura = new Vector3(_alvo.position.x, transform.position.y, _alvo.position.z);
-        Vector3 direcaoAoAlvo = (posicaoAlvoMesmaAltura - transform.position).normalized;
+        Vector3 direcaoAoAlvo = DirecaoHorizontalAoAlvo();
         Vector3 lateral = Vector3.Cross(Vector3.up, direcaoAoAlvo);
-
         float oscilacao = Mathf.Sin(Time.time * _velocidadeOscilacao + _deslocamentoAleatorio) * AmplitudeOscilacao;
 
         Vector3 movimento = (direcaoAoAlvo * Velocidade) + (lateral * oscilacao);
         transform.position += movimento * Time.deltaTime;
     }
 
-    private void ManterAlturaFixa()
+    // Ponto de extensão secundário: permite alterar a altura antes de
+    // travar na altura fixa (ex: oscilação vertical). Padrão: mantém
+    // a altura de nascimento, sem variação.
+    protected virtual void AplicarAlturaFinal()
     {
         Vector3 posicao = transform.position;
         posicao.y = _alturaFixa;
         transform.position = posicao;
     }
 
-    private float DistanciaHorizontalAteAlvo()
+    protected float AlturaFixa => _alturaFixa;
+
+    protected Vector3 DirecaoHorizontalAoAlvo()
+    {
+        Vector3 posicaoAlvoMesmaAltura = new Vector3(_alvo.position.x, transform.position.y, _alvo.position.z);
+        return (posicaoAlvoMesmaAltura - transform.position).normalized;
+    }
+
+    protected float DistanciaHorizontalAteAlvo()
     {
         Vector3 posicaoAtualSemAltura = new Vector3(transform.position.x, 0f, transform.position.z);
         Vector3 posicaoAlvoSemAltura = new Vector3(_alvo.position.x, 0f, _alvo.position.z);
@@ -105,7 +116,7 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
         }
     }
 
-    private void NotificarMorteEDestruir()
+    protected void NotificarMorteEDestruir()
     {
         if (_jaNotificouMorte) return;
         _jaNotificouMorte = true;

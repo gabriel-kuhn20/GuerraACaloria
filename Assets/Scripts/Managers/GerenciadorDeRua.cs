@@ -34,4 +34,26 @@ public class GerenciadorDeRua : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(_centro, new Vector3(_largura, 0.1f, _comprimento));
     }
+
+    public Vector3 ObterPontaFinal()
+    {
+        float metadeComprimento = _comprimento / 2f;
+        return new Vector3(_centro.x, 0f, _centro.z + metadeComprimento);
+    }
+
+    // Retorna a ponta da rua (das duas extremidades) mais distante da
+    // posição de referência — usado pro chefão sempre nascer do lado
+    // oposto de onde o jogador está, sem depender de qual ponta é
+    // "início" ou "fim" na configuração da cena.
+    public Vector3 ObterPontaMaisDistanteDe(Vector3 posicaoReferencia)
+    {
+        float metadeComprimento = _comprimento / 2f;
+        Vector3 pontaPositiva = new Vector3(_centro.x, 0f, _centro.z + metadeComprimento);
+        Vector3 pontaNegativa = new Vector3(_centro.x, 0f, _centro.z - metadeComprimento);
+
+        float distanciaPositiva = Mathf.Abs(pontaPositiva.z - posicaoReferencia.z);
+        float distanciaNegativa = Mathf.Abs(pontaNegativa.z - posicaoReferencia.z);
+
+        return distanciaPositiva >= distanciaNegativa ? pontaPositiva : pontaNegativa;
+    }
 }

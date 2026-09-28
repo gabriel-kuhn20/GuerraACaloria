@@ -15,14 +15,22 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GeradorDeInimigos _geradorDeInimigos;
     [SerializeField] private float _duracaoVisivelAposDano = 3f;
 
+    [Header("HUD do Chefão")]
+    [SerializeField] private GameObject _painelChefao;
+    [SerializeField] private Slider _barraDeVidaChefao;
+    [SerializeField] private TextMeshProUGUI _textoFraquezaChefao;
+
     private float _tempoRestanteVisivel;
+    private ChefaoDeCaloria _chefaoAtual;
 
     private void Start()
     {
         GerenciadorDeJogo.Instancia.AoPerderJogo += MostrarTelaGameOver;
         GerenciadorDeJogo.Instancia.AoReceberDano += MostrarBarraTemporariamente;
         _geradorDeInimigos.AoMudarDeOnda += AtualizarTextoOnda;
+        _geradorDeInimigos.AoSpawnarChefao += ConfigurarUIChefao;
         _barraDeEnergia.gameObject.SetActive(false);
+        _painelChefao.SetActive(false);
     }
 
     private void Update()
@@ -33,7 +41,7 @@ public class UIManager : MonoBehaviour
 
     private void AtualizarBarraDeEnergia()
     {
-        _barraDeEnergia.maxValue = 100f;
+        _barraDeEnergia.maxValue = GerenciadorDeJogo.Instancia.EnergiaMaxima;
         _barraDeEnergia.value = GerenciadorDeJogo.Instancia.EnergiaAtual;
     }
 
@@ -77,5 +85,43 @@ public class UIManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    private void ConfigurarUIChefao(ChefaoDeCaloria chefao)
+    {
+        _chefaoAtual = chefao;
+
+        _painelChefao.SetActive(true);
+        _barraDeVidaChefao.maxValue = chefao.VidaMaxima;
+        _barraDeVidaChefao.value = chefao.VidaAtual;
+        AtualizarFraquezaChefao(chefao.Fraqueza);
+
+        chefao.AoMudarVida += AtualizarVidaChefao;
+        chefao.AoMudarFraqueza += AtualizarFraquezaChefao;
+        chefao.AoMorrer += EsconderUIChefao;
+    }
+
+    private void AtualizarVidaChefao(int vidaAtual, int vidaMaxima)
+    {
+        _barraDeVidaChefao.maxValue = vidaMaxima;
+        _barraDeVidaChefao.value = vidaAtual;
+    }
+
+    private void AtualizarFraquezaChefao(TipoMunicao fraqueza)
+    {
+        _textoFraquezaChefao.text = $"Fraqueza do chefão: {fraqueza}";
+    }
+
+    private void EsconderUIChefao()
+    {
+        _painelChefao.SetActive(false);
+
+        if (_chefaoAtual != null)
+        {
+            _chefaoAtual.AoMudarVida -= AtualizarVidaChefao;
+            _chefaoAtual.AoMudarFraqueza -= AtualizarFraquezaChefao;
+            _chefaoAtual.AoMorrer -= EsconderUIChefao;
+            _chefaoAtual = null;
+        }
     }
 }
