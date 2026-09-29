@@ -3,14 +3,13 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-// Atualiza os elementos visuais do HUD: barra de energia da cidade,
-// indicador de munição atual, número da onda e tela de Game Over.
 public class UIManager : MonoBehaviour
 {
     [SerializeField] private Slider _barraDeEnergia;
     [SerializeField] private TextMeshProUGUI _textoMunicao;
     [SerializeField] private TextMeshProUGUI _textoOnda;
     [SerializeField] private GameObject _telaGameOver;
+    [SerializeField] private GameObject _telaVitoria;
     [SerializeField] private GameObject _crosshair;
     [SerializeField] private GeradorDeInimigos _geradorDeInimigos;
     [SerializeField] private float _duracaoVisivelAposDano = 3f;
@@ -26,6 +25,7 @@ public class UIManager : MonoBehaviour
     private void Start()
     {
         GerenciadorDeJogo.Instancia.AoPerderJogo += MostrarTelaGameOver;
+        GerenciadorDeJogo.Instancia.AoVencerJogo += MostrarTelaVitoria;
         GerenciadorDeJogo.Instancia.AoReceberDano += MostrarBarraTemporariamente;
         _geradorDeInimigos.AoMudarDeOnda += AtualizarTextoOnda;
         _geradorDeInimigos.AoSpawnarChefao += ConfigurarUIChefao;
@@ -74,7 +74,18 @@ public class UIManager : MonoBehaviour
 
     private void MostrarTelaGameOver()
     {
-        _telaGameOver.SetActive(true);
+        FinalizarPartida(_telaGameOver);
+    }
+
+    private void MostrarTelaVitoria()
+    {
+        _painelChefao.SetActive(false);
+        FinalizarPartida(_telaVitoria);
+    }
+
+    private void FinalizarPartida(GameObject telaParaMostrar)
+    {
+        telaParaMostrar.SetActive(true);
         _textoMunicao.gameObject.SetActive(false);
         _crosshair.SetActive(false);
         Cursor.lockState = CursorLockMode.None;
@@ -98,7 +109,6 @@ public class UIManager : MonoBehaviour
 
         chefao.AoMudarVida += AtualizarVidaChefao;
         chefao.AoMudarFraqueza += AtualizarFraquezaChefao;
-        chefao.AoMorrer += EsconderUIChefao;
     }
 
     private void AtualizarVidaChefao(int vidaAtual, int vidaMaxima)
@@ -110,18 +120,5 @@ public class UIManager : MonoBehaviour
     private void AtualizarFraquezaChefao(TipoMunicao fraqueza)
     {
         _textoFraquezaChefao.text = $"Fraqueza do chefão: {fraqueza}";
-    }
-
-    private void EsconderUIChefao()
-    {
-        _painelChefao.SetActive(false);
-
-        if (_chefaoAtual != null)
-        {
-            _chefaoAtual.AoMudarVida -= AtualizarVidaChefao;
-            _chefaoAtual.AoMudarFraqueza -= AtualizarFraquezaChefao;
-            _chefaoAtual.AoMorrer -= EsconderUIChefao;
-            _chefaoAtual = null;
-        }
     }
 }

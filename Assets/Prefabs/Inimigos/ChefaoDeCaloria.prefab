@@ -26,7 +26,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: -2, z: 0}
-  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_LocalScale: {x: 30, y: 30, z: 30}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7077951192564070106}
@@ -63,7 +63,7 @@ Transform:
   m_GameObject: {fileID: 8743567355274155775}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.8, z: 0}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -142,6 +142,7 @@ MonoBehaviour:
   _intervaloBuscaAlvo: 0.5
   _vidaMaxima: 30
   _intervaloTrocaDeFraqueza: 4
+  _escalaVisual: 0.1
   _animator: {fileID: 3808290255609048224}
   _nomeTriggerMorte: Morrer
   _duracaoAnimacaoMorte: 2
@@ -191,7 +192,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 5
+  m_Radius: 30
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!95 &8833810915608341907
 Animator:

@@ -9,6 +9,7 @@ public class ChefaoDeCaloria : Inimigo
 {
     [SerializeField] private int _vidaMaxima = 30;
     [SerializeField] private float _intervaloTrocaDeFraqueza = 4f;
+    [SerializeField] private float _escalaVisual = 0.1f;
     [SerializeField] private Animator _animator;
     [SerializeField] private string _nomeTriggerMorte = "Morrer";
     [SerializeField] private float _duracaoAnimacaoMorte = 2f;
@@ -30,6 +31,7 @@ public class ChefaoDeCaloria : Inimigo
     protected override void Awake()
     {
         base.Awake();
+        transform.localScale = Vector3.one * _escalaVisual;
         _vida = _vidaMaxima;
     }
 
@@ -37,22 +39,23 @@ public class ChefaoDeCaloria : Inimigo
     {
         base.Start();
         SortearNovaFraqueza();
+        _proximaTroca = Time.time + _intervaloTrocaDeFraqueza;
     }
 
-        protected override void Update()
+    protected override void Update()
+    {
+        if (_estaMorrendo) return;
+
+        base.Update();
+        AtualizarTrocaDeFraqueza();
+
+#if UNITY_EDITOR
+        if (Time.frameCount % 30 == 0)
         {
-            if (_estaMorrendo) return;
-
-            base.Update();
-            AtualizarTrocaDeFraqueza();
-
-    #if UNITY_EDITOR
-            if (Time.frameCount % 30 == 0)
-            {
-                Debug.Log($"[ChefaoDeCaloria] Alvo: {(_alvo != null ? _alvo.name : "NULL")} | Posicao: {transform.position} | Vida: {_vida}");
-            }
-    #endif
+            Debug.Log($"[ChefaoDeCaloria] Alvo: {(_alvo != null ? _alvo.name : "NULL")} | Posicao: {transform.position} | Vida: {_vida}");
         }
+#endif
+    }
 
     private void AtualizarTrocaDeFraqueza()
     {

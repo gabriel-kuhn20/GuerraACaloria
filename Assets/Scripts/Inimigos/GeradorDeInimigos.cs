@@ -105,10 +105,15 @@ public class GeradorDeInimigos : MonoBehaviour
         Debug.Log($"[GeradorDeInimigos] Posicao real apos Instantiate: {chefaoCriado.transform.position}");
 
         ChefaoDeCaloria chefao = chefaoCriado.GetComponent<ChefaoDeCaloria>();
-        chefao.AoMorrer += RegistrarDerrota;
+        chefao.AoMorrer += RegistrarVitoriaSobreChefao;
         _inimigosRestantesNaOnda++;
 
         AoSpawnarChefao?.Invoke(chefao);
+    }
+
+    private void RegistrarVitoriaSobreChefao()
+    {
+        GerenciadorDeJogo.Instancia.RegistrarVitoria();
     }
 
     private void SpawnarInimigo()

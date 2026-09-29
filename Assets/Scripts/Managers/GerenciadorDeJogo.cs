@@ -1,9 +1,6 @@
 using UnityEngine;
 using System;
 
-// Gerencia o estado global do jogo: energia da cidade, e futuramente
-// onda atual e condição de vitória/derrota. Singleton acessado por
-// outros scripts via GerenciadorDeJogo.Instancia.
 public class GerenciadorDeJogo : MonoBehaviour
 {
     public static GerenciadorDeJogo Instancia { get; private set; }
@@ -15,6 +12,7 @@ public class GerenciadorDeJogo : MonoBehaviour
     public int EnergiaMaxima => _energiaMaxima;
     public int EnergiaAtual => _energiaAtual;
     public event Action AoPerderJogo;
+    public event Action AoVencerJogo;
     public event Action AoReceberDano;
 
     private void Awake()
@@ -22,8 +20,7 @@ public class GerenciadorDeJogo : MonoBehaviour
         if (Instancia != null && Instancia != this) { Destroy(gameObject); return; }
         Instancia = this;
         _energiaAtual = _energiaMaxima;
-        Time.timeScale = 1f; // garante que a cena nunca comece pausada,
-                              // mesmo se um Game Over anterior deixou timeScale em 0
+        Time.timeScale = 1f;
     }
 
     public void ReceberDanoNaCidade(int quantidade)
@@ -37,15 +34,25 @@ public class GerenciadorDeJogo : MonoBehaviour
         if (_energiaAtual <= 0)
         {
             _jogoAcabou = true;
-            EncerrarJogo();
+            EncerrarJogo(vitoria: false);
         }
     }
 
-    private void EncerrarJogo()
+    public void RegistrarVitoria()
+    {
+        if (_jogoAcabou) return;
+
+        _jogoAcabou = true;
+        EncerrarJogo(vitoria: true);
+    }
+
+    private void EncerrarJogo(bool vitoria)
     {
         GerenciadorDeAudio.Instancia.PararTodosOsSons();
         DestruirProjeteisRestantes();
-        AoPerderJogo?.Invoke();
+
+        if (vitoria) AoVencerJogo?.Invoke();
+        else AoPerderJogo?.Invoke();
     }
 
     private void DestruirProjeteisRestantes()
