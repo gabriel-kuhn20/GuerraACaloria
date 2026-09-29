@@ -48,13 +48,6 @@ public class ChefaoDeCaloria : Inimigo
 
         base.Update();
         AtualizarTrocaDeFraqueza();
-
-#if UNITY_EDITOR
-        if (Time.frameCount % 30 == 0)
-        {
-            Debug.Log($"[ChefaoDeCaloria] Alvo: {(_alvo != null ? _alvo.name : "NULL")} | Posicao: {transform.position} | Vida: {_vida}");
-        }
-#endif
     }
 
     private void AtualizarTrocaDeFraqueza()

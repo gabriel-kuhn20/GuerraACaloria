@@ -9,7 +9,7 @@ public class HamburguerVoador : Inimigo
     [SerializeField] private float _multiplicadorVelocidadeMaxima = 2.5f;
 
     public override TipoMunicao Fraqueza => TipoMunicao.Agua;
-    protected override float Velocidade => 10f;
+    protected override float Velocidade => 14f;
     protected override int DanoAoAlcancarAlvo => 20;
     protected override float AmplitudeOscilacao => 0.4f;
 

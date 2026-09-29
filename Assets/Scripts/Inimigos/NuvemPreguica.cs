@@ -9,7 +9,7 @@ public class NuvemDePreguica : Inimigo
     [SerializeField] private float _velocidadeFlutuacao = 1.2f;
 
     public override TipoMunicao Fraqueza => TipoMunicao.EnergiaPositiva;
-    protected override float Velocidade => 8f;
+    protected override float Velocidade => 12f;
     protected override int DanoAoAlcancarAlvo => 16;
     protected override float AmplitudeOscilacao => 0.2f;
 

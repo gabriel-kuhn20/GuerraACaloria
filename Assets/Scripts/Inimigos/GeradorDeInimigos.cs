@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 using System;
 using System.Collections;
 
@@ -32,19 +31,6 @@ public class GeradorDeInimigos : MonoBehaviour
     {
         IniciarProximaOnda();
     }
-
-#if UNITY_EDITOR
-    // Tecla de debug: pressione B pra spawnar o chefão na hora, sem
-    // precisar zerar as 2 ondas anteriores. Só compila no Editor.
-    private void Update()
-    {
-        if (Keyboard.current != null && Keyboard.current.bKey.wasPressedThisFrame)
-        {
-            _chefaoJaApareceu = false;
-            SpawnarChefao();
-        }
-    }
-#endif
 
     private void IniciarProximaOnda()
     {
@@ -100,9 +86,7 @@ public class GeradorDeInimigos : MonoBehaviour
 
     private void SpawnarChefao()
     {
-        Debug.Log($"[GeradorDeInimigos] Spawnando chefao em: {_pontoDeSpawnChefao.position}");
         GameObject chefaoCriado = Instantiate(_prefabDoChefao, _pontoDeSpawnChefao.position, Quaternion.identity);
-        Debug.Log($"[GeradorDeInimigos] Posicao real apos Instantiate: {chefaoCriado.transform.position}");
 
         ChefaoDeCaloria chefao = chefaoCriado.GetComponent<ChefaoDeCaloria>();
         chefao.AoMorrer += RegistrarVitoriaSobreChefao;
