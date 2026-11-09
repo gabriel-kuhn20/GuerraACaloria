@@ -52,6 +52,7 @@ public static class CriadorDeHUD
 
         EditorSceneManager.OpenScene(Cenas[0]);
         GameObject[] prefabsDePowerUp = CriarPrefabsDePowerUp();
+        CriarArremessoDoChefao();
         BancoDePerguntas banco = DadosIniciaisDoQuiz.CriarSeNaoExistir();
         CriadorDeChefoes.GarantirChefoes();
         ConfiguradorDeAudio.ConfigurarMusicasDasFases();
@@ -82,6 +83,68 @@ public static class CriadorDeHUD
             CriarPrefabDePowerUp<PowerUpSuco>("PowerUpSuco", "Glass_005", new Color(1f, 0.62f, 0.2f)),
             CriarPrefabDePowerUp<PowerUpAbacate>("PowerUpAbacate", "Avocado_001", new Color(0.75f, 0.95f, 0.35f)),
         };
+    }
+
+    // Comida que o chefão arremessa no agente: modelo do pacote de comidas +
+    // ProjetilDoChefao + colisor (para o tiro do jogador conseguir destruir).
+    // Já liga o prefab no ChefaoDeCaloria.prefab.
+    private static void CriarArremessoDoChefao()
+    {
+        GameObject raiz = new GameObject("ProjetilDoChefao");
+        raiz.AddComponent<ProjetilDoChefao>();
+        SphereCollider colisor = raiz.AddComponent<SphereCollider>();
+        colisor.isTrigger = true;
+        colisor.radius = 0.7f;
+
+        GameObject modelo = AssetDatabase.LoadAssetAtPath<GameObject>($"{PastaComidas}Cookie_006.prefab");
+        if (modelo != null)
+        {
+            GameObject visual = (GameObject)PrefabUtility.InstantiatePrefab(modelo);
+            PrefabUtility.UnpackPrefabInstance(visual, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+            visual.transform.SetParent(raiz.transform, false);
+            foreach (Collider c in visual.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(c);
+            AjustarTamanhoECentralizar(visual, raiz.transform.position, 1.1f);
+        }
+
+        Light brilho = new GameObject("Brilho").AddComponent<Light>();
+        brilho.transform.SetParent(raiz.transform, false);
+        brilho.type = LightType.Point;
+        brilho.color = new Color(1f, 0.55f, 0.2f);
+        brilho.range = 4f;
+        brilho.intensity = 3f;
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(raiz, "Assets/Prefabs/Projeteis/ProjetilDoChefao.prefab");
+        Object.DestroyImmediate(raiz);
+
+        GameObject prefabDoChefao = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Inimigos/ChefaoDeCaloria.prefab");
+        ChefaoDeCaloria chefao = prefabDoChefao != null ? prefabDoChefao.GetComponent<ChefaoDeCaloria>() : null;
+        if (chefao == null)
+        {
+            Debug.LogWarning("[CriadorDeHUD] ChefaoDeCaloria.prefab não encontrado; arremesso não foi ligado.");
+            return;
+        }
+
+        SerializedObject dados = new SerializedObject(chefao);
+        dados.FindProperty("_prefabDoArremesso").objectReferenceValue = prefab.GetComponent<ProjetilDoChefao>();
+        dados.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(prefabDoChefao);
+        AssetDatabase.SaveAssets();
+    }
+
+    // Logo acima do painel de saúde dos cidadãos: barra de vida do agente.
+    private static void CriarPainelDoAgente(Transform hud, out Image barra, out TextMeshProUGUI rotulo)
+    {
+        Image painel = CriarImagem(hud, "PainelAgente", CorPainel, SpriteArredondado);
+        Ancorar(painel.rectTransform, Vector2.zero, Vector2.zero, new Vector2(32f, 166f), new Vector2(520f, 54f));
+
+        rotulo = CriarTexto(painel.transform, "Rotulo", "AGENTE", 22f, CorTextoSecundario, Vector2.zero, Vector2.zero);
+        Ancorar(rotulo.rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(24f, 0f), new Vector2(170f, 32f));
+        rotulo.alignment = TextAlignmentOptions.MidlineLeft;
+        rotulo.characterSpacing = 3f;
+
+        Image trilho = CriarImagem(painel.transform, "Trilho", CorTrilho, SpriteArredondado);
+        Ancorar(trilho.rectTransform, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-24f, 0f), new Vector2(300f, 18f));
+        barra = CriarBarraPreenchida(trilho.transform, "Vida", new Color(0.35f, 0.75f, 1f));
     }
 
     private static GameObject CriarPrefabDePowerUp<T>(string nome, string modelo, Color cor) where T : PowerUp
@@ -137,6 +200,10 @@ public static class CriadorDeHUD
 
     private static void GarantirManagers(GameObject[] prefabsDePowerUp, BancoDePerguntas banco)
     {
+        // Vida do Agente fica no próprio objeto do jogador.
+        MovimentoJogador jogador = Object.FindFirstObjectByType<MovimentoJogador>();
+        if (jogador != null && jogador.GetComponent<VidaDoAgente>() == null) jogador.gameObject.AddComponent<VidaDoAgente>();
+
         GerenciadorDeJogo jogo = Object.FindFirstObjectByType<GerenciadorDeJogo>();
         Transform pastaDosManagers = jogo.transform.parent;
 
@@ -243,6 +310,9 @@ public static class CriadorDeHUD
         dados.FindProperty("_barraDeEnergiaAtraso").objectReferenceValue = barraAtraso;
         dados.FindProperty("_textoEnergia").objectReferenceValue = textoEnergia;
         dados.FindProperty("_textoCidadaos").objectReferenceValue = textoCidadaos;
+        CriarPainelDoAgente(hud, out Image barraAgente, out TextMeshProUGUI textoAgente);
+        dados.FindProperty("_barraVidaAgente").objectReferenceValue = barraAgente;
+        dados.FindProperty("_textoVidaAgente").objectReferenceValue = textoAgente;
         CriarBarraEspecial(hud, out Image barraEspecial, out TextMeshProUGUI textoEspecial);
         dados.FindProperty("_barraEspecial").objectReferenceValue = barraEspecial;
         dados.FindProperty("_textoEspecial").objectReferenceValue = textoEspecial;
@@ -580,7 +650,7 @@ public static class CriadorDeHUD
     private static TextMeshProUGUI CriarTextoDeEfeitos(Transform hud, out GameObject painelEfeitos)
     {
         Image painel = CriarImagem(hud, "PainelEfeitos", CorPainel, SpriteArredondado);
-        Ancorar(painel.rectTransform, Vector2.zero, Vector2.zero, new Vector2(32f, 172f), new Vector2(0f, 0f));
+        Ancorar(painel.rectTransform, Vector2.zero, Vector2.zero, new Vector2(32f, 232f), new Vector2(0f, 0f));
 
         VerticalLayoutGroup layout = painel.gameObject.AddComponent<VerticalLayoutGroup>();
         layout.padding = new RectOffset(22, 22, 12, 12);

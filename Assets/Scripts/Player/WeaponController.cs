@@ -30,6 +30,7 @@ public class WeaponController : MonoBehaviour
     private void Update()
     {
         if (Time.timeScale == 0f || GerenciadorDeMelhorias.EscolhaRecemFechada) return;
+        if (VidaDoAgente.Instancia != null && VidaDoAgente.Instancia.EstaNocauteado) return;
 
         TrocarMunicaoPorTeclado();
         AtualizarMira();

@@ -146,6 +146,35 @@ MonoBehaviour:
   _animator: {fileID: 3808290255609048224}
   _nomeTriggerMorte: Morrer
   _duracaoAnimacaoMorte: 2
+  _distanciaDeRecuo: 12
+  _nome: "CHEF\xC3O DE CALORIA"
+  _danoAoAlcancar: 30
+  _fraquezasPossiveis: 000000000100000002000000
+  _velocidadeBase: 5
+  _curaPorErro: 1
+  _multiplicadorDeVelocidadePorEstagio:
+  - 1
+  - 1.35
+  - 1.7
+  _intervaloDeTrocaPorEstagio:
+  - 4
+  - 2.8
+  - 1.8
+  _invulnerabilidadeAoEnfurecer: 1.5
+  _fracaoDeDanoDoEspecial: 0.2
+  _variacaoDosTempos: 0.2
+  _intervaloDeInvestida: 7
+  _duracaoDaInvestida: 1.2
+  _multiplicadorDaInvestida: 3
+  _intervaloDeLacaios: 9
+  _lacaiosPorEstagio: 010000000200000003000000
+  _maximoDeLacaiosVivos: 6
+  _prefabDoArremesso: {fileID: 3764539026931181643, guid: 523822d47c1ce244fbdcc78fb6ddfef9, type: 3}
+  _intervaloDeArremesso: 5
+  _arremessosPorEstagio: 010000000200000003000000
+  _aberturaDoLeque: 14
+  _intervaloDeEscudo: 10
+  _duracaoDoEscudo: 2.5
 --- !u!54 &5754333240987639825
 Rigidbody:
   m_ObjectHideFlags: 0

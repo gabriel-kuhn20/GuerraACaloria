@@ -21,6 +21,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Color _corEnergiaBaixa = new Color(0.95f, 0.3f, 0.3f);
     [SerializeField] private float _intensidadeVinheta = 0.35f;
 
+    [Header("Vida do Agente")]
+    [SerializeField] private Image _barraVidaAgente;
+    [SerializeField] private TextMeshProUGUI _textoVidaAgente;
+
     [Header("Munição")]
     [SerializeField] private TextMeshProUGUI _textoMunicao;
     [Tooltip("Um slot por munição, na mesma ordem do enum TipoMunicao.")]
@@ -117,6 +121,12 @@ public class UIManager : MonoBehaviour
         GerenciadorDeCidadaos.Instancia.AoSequestrarCidadao += MostrarSequestro;
         GerenciadorDeCidadaos.Instancia.AoPerderCidadao += MostrarPerdaDeCidadao;
         if (GerenciadorDeMelhorias.Instancia != null) GerenciadorDeMelhorias.Instancia.AoEscolherMelhoria += MostrarMelhoriaEscolhida;
+        if (VidaDoAgente.Instancia != null)
+        {
+            VidaDoAgente.Instancia.AoReceberDano += ReagirAoDano;
+            VidaDoAgente.Instancia.AoNocautear += MostrarNocaute;
+            VidaDoAgente.Instancia.AoRecuperar += MostrarRecuperacao;
+        }
         if (GerenciadorDeEspecial.Instancia != null)
         {
             GerenciadorDeEspecial.Instancia.AoEncher += MostrarEspecialPronto;
@@ -141,6 +151,31 @@ public class UIManager : MonoBehaviour
         AtualizarEfeitosAtivos();
         AtualizarMira();
         AtualizarBarraEspecial();
+        AtualizarVidaDoAgente();
+    }
+
+    private void AtualizarVidaDoAgente()
+    {
+        VidaDoAgente agente = VidaDoAgente.Instancia;
+        if (_barraVidaAgente == null || agente == null) return;
+
+        _barraVidaAgente.fillAmount = agente.Fracao;
+        float pulso = 0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 10f);
+        _barraVidaAgente.color = agente.EstaNocauteado
+            ? Color.Lerp(new Color(0.5f, 0.5f, 0.5f), Color.white, pulso * 0.4f)
+            : Color.Lerp(new Color(0.95f, 0.35f, 0.3f), new Color(0.35f, 0.75f, 1f), agente.Fracao);
+
+        if (_textoVidaAgente != null) _textoVidaAgente.text = agente.EstaNocauteado ? "NOCAUTEADO" : "AGENTE";
+    }
+
+    private void MostrarNocaute()
+    {
+        MostrarAviso("VOCÊ FOI NOCAUTEADO!", "Fique longe dos inimigos e destrua os arremessos do chefão", new Color(1f, 0.4f, 0.4f), 3f);
+    }
+
+    private void MostrarRecuperacao()
+    {
+        MostrarAviso("DE VOLTA À AÇÃO!", "", new Color(0.35f, 0.75f, 1f), 1.5f);
     }
 
     // Cheia: pisca entre amarelo e branco e mostra a tecla.

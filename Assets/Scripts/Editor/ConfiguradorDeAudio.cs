@@ -57,6 +57,8 @@ public static class ConfiguradorDeAudio
         { "_somMelhoriaEscolher", "MelhoriaEscolher" },
         { "_somVitoria", "Vitoria" },
         { "_somDerrota", "Derrota" },
+        { "_somAgenteAtingido", "AgenteAtingido" },
+        { "_somChefaoArremesso", "ChefaoArremesso" },
     };
 
     [MenuItem("GuerraACaloria/Configurar Áudio")]

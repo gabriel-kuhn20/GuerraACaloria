@@ -3,7 +3,8 @@ using UnityEngine.InputSystem;
 
 // Controla o movimento livre do Agente da Vitalidade pela rua (WASD),
 // restrito aos limites definidos pelo GerenciadorDeRua. Pode ficar
-// lento temporariamente (ex: perto da Nuvem de Preguiça).
+// lento temporariamente (ex: perto da Nuvem de Preguiça), ser empurrado
+// por golpes de inimigos e fica parado enquanto estiver nocauteado.
 [RequireComponent(typeof(CharacterController))]
 public class MovimentoJogador : MonoBehaviour
 {
@@ -11,6 +12,8 @@ public class MovimentoJogador : MonoBehaviour
     private CharacterController _controller;
     private float _fatorDeLentidao = 1f;
     private float _fimDaLentidao;
+    private Vector3 _empurrao;
+    [SerializeField] private float _frenagemDoEmpurrao = 22f;
 
     public bool EstaLento => Time.time < _fimDaLentidao;
 
@@ -23,13 +26,22 @@ public class MovimentoJogador : MonoBehaviour
     {
         if (Time.timeScale == 0f) return;
 
-        Vector2 entrada = ObterEntradaMovimento();
+        bool nocauteado = VidaDoAgente.Instancia != null && VidaDoAgente.Instancia.EstaNocauteado;
+        Vector2 entrada = nocauteado ? Vector2.zero : ObterEntradaMovimento();
         Vector3 direcao = (transform.right * entrada.x + transform.forward * entrada.y).normalized;
         float fator = EstaLento ? _fatorDeLentidao : 1f;
         float velocidade = _velocidade * GerenciadorDeMelhorias.Atributos.MultiplicadorDeMovimento;
-        _controller.Move(direcao * velocidade * fator * Time.deltaTime);
+        _controller.Move((direcao * velocidade * fator + _empurrao) * Time.deltaTime);
+        _empurrao = Vector3.MoveTowards(_empurrao, Vector3.zero, _frenagemDoEmpurrao * Time.deltaTime);
 
         RestringirNaRua();
+    }
+
+    // Golpe de inimigo: empurrão que perde força rapidamente.
+    public void Empurrar(Vector3 impulso)
+    {
+        impulso.y = 0f;
+        _empurrao += impulso;
     }
 
     // Fatores menores = mais lento. Se vários efeitos se sobrepõem, vale o mais forte.

@@ -36,6 +36,7 @@ public class GerenciadorDeAudio : MonoBehaviour
     [SerializeField] private AudioClip _somTrocaMunicao;
     [SerializeField] private AudioClip _somEspecialPronto;
     [SerializeField] private AudioClip _somEspecialSoltar;
+    [SerializeField] private AudioClip _somAgenteAtingido;
 
     [Header("Inimigos e cidadãos")]
     [SerializeField] private AudioClip _somInimigoDerrotado;
@@ -48,6 +49,7 @@ public class GerenciadorDeAudio : MonoBehaviour
     [SerializeField] private AudioClip _somChefaoEscudo;
     [SerializeField] private AudioClip _somLacaio;
     [SerializeField] private AudioClip _somChefaoDerrotado;
+    [SerializeField] private AudioClip _somChefaoArremesso;
 
     [Header("Progresso")]
     [SerializeField] private AudioClip _somOndaInicio;
@@ -159,6 +161,7 @@ public class GerenciadorDeAudio : MonoBehaviour
 
     public void TocarSomTrocaMunicao(TipoMunicao municao) => TocarOuVariar(_somTrocaMunicao, _somClique, 1.6f, 1f + 0.1f * (int)municao);
     public void TocarSomEspecialPronto() => TocarOuVariar(_somEspecialPronto, _somPowerUp, 1.8f);
+    public void TocarSomAgenteAtingido() => TocarOuVariar(_somAgenteAtingido, _somErro, 0.7f);
     public void TocarSomEspecialSoltar() => TocarOuVariar(_somEspecialSoltar, _somAlarme, 0.5f);
 
     // ----- Inimigos e cidadãos -----
@@ -171,6 +174,7 @@ public class GerenciadorDeAudio : MonoBehaviour
     public void TocarSomChefaoInvestida() => TocarOuVariar(_somChefaoInvestida, _somTiro, 0.5f);
     public void TocarSomChefaoEscudo() => TocarOuVariar(_somChefaoEscudo, _somPowerUp, 0.7f);
     public void TocarSomLacaio() => TocarVariado(_somLacaio != null ? _somLacaio : _somTiro, _somLacaio != null ? 1f : 0.6f);
+    public void TocarSomChefaoArremesso() => TocarOuVariar(_somChefaoArremesso, _somTiro, 0.6f);
     public void TocarSomChefaoDerrotado() => TocarOuVariar(_somChefaoDerrotado, _somAlarme, 0.8f);
 
     // ----- Progresso -----

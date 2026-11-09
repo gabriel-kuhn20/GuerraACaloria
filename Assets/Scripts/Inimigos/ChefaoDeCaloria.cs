@@ -49,6 +49,12 @@ public class ChefaoDeCaloria : Inimigo
     [SerializeField] private int[] _lacaiosPorEstagio = { 1, 2, 3 };
     [SerializeField] private int _maximoDeLacaiosVivos = 6;
 
+    [Header("Arremesso no Agente")]
+    [SerializeField] private ProjetilDoChefao _prefabDoArremesso;
+    [SerializeField] private float _intervaloDeArremesso = 5f;
+    [SerializeField] private int[] _arremessosPorEstagio = { 1, 2, 3 };
+    [SerializeField] private float _aberturaDoLeque = 14f;
+
     [Header("Escudo")]
     [SerializeField] private float _intervaloDeEscudo = 10f;
     [SerializeField] private float _duracaoDoEscudo = 2.5f;
@@ -62,6 +68,7 @@ public class ChefaoDeCaloria : Inimigo
     private float _fimDaInvestida;
     private float _proximoLacaio;
     private float _proximoEscudo;
+    private float _proximoArremesso;
     private HabilidadesDoChefao _habilidades = HabilidadesDoChefao.Investida;
     private GameObject[] _prefabsDeLacaios;
     private readonly List<Inimigo> _lacaiosVivos = new List<Inimigo>();
@@ -78,6 +85,12 @@ public class ChefaoDeCaloria : Inimigo
     protected override int DanoAoAlcancarAlvo => _danoAoAlcancar;
     protected override float AmplitudeOscilacao => 0.3f;
     protected override int PontosAoDerrotar => 1000;
+    // O chefão não troca de alvo (mira nos cidadãos), mas encostar nele dói bem mais
+    // e ele ataca o agente à distância com arremessos.
+    protected override float ChanceDeSerAgressivo => 0f;
+    protected override int DanoNoAgente => 20;
+    protected override float RaioDeContatoComAgente => 2.6f;
+    protected override float ForcaDoEmpurraoNoAgente => 2.5f;
 
     private bool EstaInvestindo => Time.time < _fimDaInvestida;
     private bool EstaInvulneravel => Time.time < _fimDaInvulnerabilidade;
@@ -216,6 +229,7 @@ public class ChefaoDeCaloria : Inimigo
         _proximaInvestida = Time.time + Variar(_intervaloDeInvestida);
         _proximoLacaio = Time.time + Variar(_intervaloDeLacaios * 0.5f);
         _proximoEscudo = Time.time + Variar(_intervaloDeEscudo);
+        _proximoArremesso = Time.time + Variar(_intervaloDeArremesso * 0.6f);
     }
 
     protected override void Update()
@@ -228,6 +242,7 @@ public class ChefaoDeCaloria : Inimigo
         if (Tem(HabilidadesDoChefao.Investida)) AtualizarInvestida();
         if (Tem(HabilidadesDoChefao.Lacaios)) AtualizarLacaios();
         if (Tem(HabilidadesDoChefao.Escudo)) AtualizarEscudo();
+        AtualizarArremesso();
     }
 
     private void AtualizarTrocaDeFraqueza()
@@ -283,6 +298,26 @@ public class ChefaoDeCaloria : Inimigo
         _proximoEscudo = _fimDaInvulnerabilidade + Variar(_intervaloDeEscudo);
         TextoFlutuante.Criar(transform.position + Vector3.up * 3f, "ESCUDO!", new Color(0.6f, 0.8f, 1f));
         GerenciadorDeAudio.Instancia.TocarSomChefaoEscudo();
+    }
+
+    // Arremesso: joga comida no agente (mais de uma, em leque, com a fúria).
+    private void AtualizarArremesso()
+    {
+        if (_prefabDoArremesso == null || Time.time < _proximoArremesso) return;
+        _proximoArremesso = Time.time + Variar(_intervaloDeArremesso / ValorDoEstagio(_multiplicadorDeVelocidadePorEstagio, 1f));
+
+        VidaDoAgente agente = VidaDoAgente.Instancia;
+        if (agente == null || agente.EstaNocauteado) return;
+
+        int quantidade = Mathf.Max(1, ValorDoEstagio(_arremessosPorEstagio, 1));
+        Vector3 origem = transform.position + Vector3.up * 2f;
+        for (int i = 0; i < quantidade; i++)
+        {
+            float desvio = (i - (quantidade - 1) / 2f) * _aberturaDoLeque;
+            ProjetilDoChefao arremesso = Instantiate(_prefabDoArremesso, origem, Quaternion.identity);
+            arremesso.Lancar(agente.transform, desvio);
+        }
+        GerenciadorDeAudio.Instancia.TocarSomChefaoArremesso();
     }
 
     private void InvocarLacaio()
