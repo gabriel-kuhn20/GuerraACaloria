@@ -21,7 +21,14 @@ public class LegendaFraquezas : MonoBehaviour
         foreach (GameObject prefab in _prefabsDeInimigo)
         {
             Inimigo inimigo = prefab.GetComponent<Inimigo>();
-            _textoLegenda.text += $"{prefab.name} → {inimigo.Fraqueza}\n";
+            _textoLegenda.text += $"<color=#FF8C70>{NomeLegivel(prefab.name)}</color>\n" +
+                                  $"   fraco contra <color=#8CF09A>{CoresDeMunicao.Nome(inimigo.Fraqueza)}</color>\n\n";
         }
+    }
+
+    // "HamburguerVoador" -> "Hamburguer Voador"
+    private string NomeLegivel(string nomeDoPrefab)
+    {
+        return System.Text.RegularExpressions.Regex.Replace(nomeDoPrefab, "(?<=[a-z])(?=[A-Z])", " ");
     }
 }

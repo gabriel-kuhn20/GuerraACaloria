@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92a33e9be69d0aa40a7c842b26f1773a, type: 3}
+  m_Name: Chefao_Fase3
+  m_EditorClassIdentifier: Assembly-CSharp::ConfiguracaoDeChefao
+  _nome: "Bar\xE3o do Salgadinho"
+  _descricao: "Pregui\xE7oso, mas resistente: levanta escudo e chama Nuvens de Pregui\xE7a."
+  _cor: {r: 0.75, g: 0.65, b: 1, a: 1}
+  _modelo: {fileID: 4698790389319236130, guid: b8ae9494f9abf9f4094e9c49c3002452, type: 3}
+  _altura: 3.4
+  _giroDoModelo: 15
+  _vida: 50
+  _velocidade: 3.5
+  _danoAoAlcancar: 35
+  _intervaloDeTrocaDeFraqueza: 3
+  _fraquezas: 000000000100000002000000
+  _habilidades: 6
+  _intervaloDeLacaios: 8
+  _lacaios:
+  - {fileID: 469878368535577484, guid: 27e2d5a6937da07469022b200c40c089, type: 3}

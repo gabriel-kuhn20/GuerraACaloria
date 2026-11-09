@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92a33e9be69d0aa40a7c842b26f1773a, type: 3}
+  m_Name: Chefao_Fase2
+  m_EditorClassIdentifier: Assembly-CSharp::ConfiguracaoDeChefao
+  _nome: Refri Gigante
+  _descricao: "R\xE1pido e cheio de a\xE7\xFAcar: chama Refrigerantes Zumbis o tempo
+    todo."
+  _cor: {r: 1, g: 0.4, b: 0.4, a: 1}
+  _modelo: {fileID: 2176325921702058319, guid: 82cc3854b29a9a4408ddbf52904f9810, type: 3}
+  _altura: 4
+  _giroDoModelo: 45
+  _vida: 40
+  _velocidade: 6
+  _danoAoAlcancar: 25
+  _intervaloDeTrocaDeFraqueza: 3.5
+  _fraquezas: 000000000100000002000000
+  _habilidades: 2
+  _intervaloDeLacaios: 6
+  _lacaios:
+  - {fileID: 469878368535577484, guid: 0f178235c6931ee49a48a2183adb99bf, type: 3}

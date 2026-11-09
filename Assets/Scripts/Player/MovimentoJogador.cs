@@ -2,12 +2,17 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 // Controla o movimento livre do Agente da Vitalidade pela rua (WASD),
-// restrito aos limites definidos pelo GerenciadorDeRua.
+// restrito aos limites definidos pelo GerenciadorDeRua. Pode ficar
+// lento temporariamente (ex: perto da Nuvem de Preguiça).
 [RequireComponent(typeof(CharacterController))]
 public class MovimentoJogador : MonoBehaviour
 {
     [SerializeField] private float _velocidade = 5f;
     private CharacterController _controller;
+    private float _fatorDeLentidao = 1f;
+    private float _fimDaLentidao;
+
+    public bool EstaLento => Time.time < _fimDaLentidao;
 
     private void Awake()
     {
@@ -20,9 +25,20 @@ public class MovimentoJogador : MonoBehaviour
 
         Vector2 entrada = ObterEntradaMovimento();
         Vector3 direcao = (transform.right * entrada.x + transform.forward * entrada.y).normalized;
-        _controller.Move(direcao * _velocidade * Time.deltaTime);
+        float fator = EstaLento ? _fatorDeLentidao : 1f;
+        float velocidade = _velocidade * GerenciadorDeMelhorias.Atributos.MultiplicadorDeMovimento;
+        _controller.Move(direcao * velocidade * fator * Time.deltaTime);
 
         RestringirNaRua();
+    }
+
+    // Fatores menores = mais lento. Se vários efeitos se sobrepõem, vale o mais forte.
+    public void AplicarLentidao(float fator, float duracao)
+    {
+        if (!EstaLento) _fatorDeLentidao = 1f;
+
+        _fatorDeLentidao = Mathf.Min(_fatorDeLentidao, Mathf.Clamp01(fator));
+        _fimDaLentidao = Mathf.Max(_fimDaLentidao, Time.time + duracao);
     }
 
     private void RestringirNaRua()

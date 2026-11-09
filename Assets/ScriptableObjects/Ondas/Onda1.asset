@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3234d4d208312834cb1aeffd2e63e4c6, type: 3}
   m_Name: Onda1
   m_EditorClassIdentifier: Assembly-CSharp::ConfiguracaoDeOnda
-  quantidadeDeInimigos: 25
-  intervaloEntreSpawns: 5
+  quantidadeDeInimigos: 4
+  intervaloEntreSpawns: 3

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8190cfca1324a72895959b45d8a64d1, type: 3}
+  m_Name: Fase4
+  m_EditorClassIdentifier: Assembly-CSharp::ConfiguracaoDeFase
+  _nome: Festival do Fast Food
+  _dicaSaudavel: "Fast food de vez em quando tudo bem: o segredo \xE9 equil\xEDbrio,
+    com frutas, verduras e \xE1gua todo dia."
+  _ondas:
+  - {fileID: 11400000, guid: 609797c858314e9cbbb9066688bc3eb4, type: 2}
+  - {fileID: 11400000, guid: f95e590122244d7bb8f4f1f6c9dafefd, type: 2}
+  - {fileID: 11400000, guid: a21076d1d62d454f9f109fca64cb042d, type: 2}
+  - {fileID: 11400000, guid: 720dd94d289c419e807da22b53a8358a, type: 2}
+  _prefabsDeInimigo: []
+  _temChefao: 1
+  _chefao: {fileID: 11400000, guid: edc1153dba23b0f499f9e4d89d1f09b9, type: 2}
+  _vidaDoChefao: 65
+  _habilidadesDoChefao: 7
+  _energiaRecuperadaAoIniciar: 80
+  _musica: {fileID: 8300000, guid: 761dcedcf1cd5d146b02ba0b7912d8da, type: 3}

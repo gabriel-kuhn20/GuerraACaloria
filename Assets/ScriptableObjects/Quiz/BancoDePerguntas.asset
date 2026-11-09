@@ -1,0 +1,139 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cde6939df92248749d18d7cd34b85585, type: 3}
+  m_Name: BancoDePerguntas
+  m_EditorClassIdentifier: Assembly-CSharp::BancoDePerguntas
+  _perguntas:
+  - _enunciado: "Qual \xE9 a melhor bebida para matar a sede no dia a dia?"
+    _alternativas:
+    - Refrigerante
+    - "\xC1gua"
+    - Suco de caixinha
+    _indiceCorreto: 1
+    _explicacao: "\xC1gua hidrata sem a\xE7\xFAcar nem calorias. \xC9 a melhor escolha
+      para o dia todo."
+  - _enunciado: "Qual destes alimentos \xE9 ultraprocessado?"
+    _alternativas:
+    - "Ma\xE7\xE3"
+    - "Arroz com feij\xE3o"
+    - Salgadinho de pacote
+    _indiceCorreto: 2
+    _explicacao: "Ultraprocessados s\xE3o feitos na ind\xFAstria com muito sal, a\xE7\xFAcar,
+      gordura e aditivos."
+  - _enunciado: "O Guia Alimentar brasileiro recomenda que a base da alimenta\xE7\xE3o
+      seja de:"
+    _alternativas:
+    - Alimentos in natura ou minimamente processados
+    - Alimentos ultraprocessados
+    - Suplementos alimentares
+    _indiceCorreto: 0
+    _explicacao: "Frutas, verduras, legumes, gr\xE3os, ovos e carnes frescas devem
+      ser a base do prato."
+  - _enunciado: "Uma lata de refrigerante comum (350 ml) tem a\xE7\xFAcar equivalente
+      a cerca de:"
+    _alternativas:
+    - "1 colher de ch\xE1"
+    - Nenhuma colher
+    - "7 colheres de ch\xE1"
+    _indiceCorreto: 2
+    _explicacao: "S\xE3o cerca de 35 g de a\xE7\xFAcar, mais ou menos 7 colheres
+      de ch\xE1 em uma \xFAnica lata!"
+  - _enunciado: "Quanto tempo de atividade f\xEDsica por dia \xE9 recomendado para
+      crian\xE7as e adolescentes?"
+    _alternativas:
+    - 60 minutos
+    - 10 minutos
+    - Nenhum
+    _indiceCorreto: 0
+    _explicacao: "A OMS recomenda, em m\xE9dia, 60 minutos por dia de atividade f\xEDsica
+      moderada a intensa."
+  - _enunciado: "Frutas, verduras e gr\xE3os integrais s\xE3o ricos em qual nutriente
+      que ajuda o intestino?"
+    _alternativas:
+    - Gordura trans
+    - Fibras
+    - "S\xF3dio"
+    _indiceCorreto: 1
+    _explicacao: "As fibras ajudam o intestino a funcionar e d\xE3o mais saciedade."
+  - _enunciado: "O excesso de sal (s\xF3dio) na alimenta\xE7\xE3o est\xE1 ligado
+      a qual problema?"
+    _alternativas:
+    - "Press\xE3o alta"
+    - Miopia
+    - Unhas fracas
+    _indiceCorreto: 0
+    _explicacao: "Comer muito sal ao longo do tempo aumenta o risco de press\xE3o
+      alta."
+  - _enunciado: "Qual \xE9 uma troca mais saud\xE1vel para o lanche da tarde?"
+    _alternativas:
+    - Biscoito recheado
+    - Bolinho industrializado
+    - Fruta com iogurte natural
+    _indiceCorreto: 2
+    _explicacao: "Fruta com iogurte natural tem menos a\xE7\xFAcar adicionado e mais
+      nutrientes."
+  - _enunciado: "Passar muitas horas parado em frente a telas, sem se mexer, \xE9
+      chamado de:"
+    _alternativas:
+    - "Hidrata\xE7\xE3o"
+    - Sedentarismo
+    - Metabolismo
+    _indiceCorreto: 1
+    _explicacao: "Sedentarismo \xE9 a falta de movimento. Levantar e se mexer faz
+      bem ao corpo e \xE0 mente."
+  - _enunciado: "Por que \xE9 bom ler o r\xF3tulo dos alimentos?"
+    _alternativas:
+    - "Para ver quanto a\xE7\xFAcar, sal e gordura ele tem"
+    - Para conhecer a cor da embalagem
+    - "N\xE3o serve para nada"
+    _indiceCorreto: 0
+    _explicacao: "O r\xF3tulo mostra ingredientes e nutrientes, ajudando a fazer
+      escolhas melhores."
+  - _enunciado: "Qual destas bebidas costuma ter MAIS a\xE7\xFAcar?"
+    _alternativas:
+    - "\xC1gua com g\xE1s"
+    - "Ch\xE1 sem a\xE7\xFAcar"
+    - Refrigerante
+    _indiceCorreto: 2
+    _explicacao: "Refrigerantes t\xEAm muito a\xE7\xFAcar adicionado e quase nenhum
+      nutriente."
+  - _enunciado: 'Dormir bem ajuda o corpo a:'
+    _alternativas:
+    - Ficar mais cansado
+    - Recuperar a energia e se desenvolver
+    - "Precisar de menos \xE1gua"
+    _indiceCorreto: 1
+    _explicacao: "Durante o sono o corpo descansa, se recupera e a mem\xF3ria se
+      organiza."
+  - _enunciado: "Comer devagar e com aten\xE7\xE3o na refei\xE7\xE3o ajuda a:"
+    _alternativas:
+    - "Perceber quando j\xE1 est\xE1 satisfeito"
+    - Sentir mais fome
+    - "Comer mais r\xE1pido"
+    _indiceCorreto: 0
+    _explicacao: "Comer com calma d\xE1 tempo para o corpo sinalizar a saciedade."
+  - _enunciado: "Arroz com feij\xE3o \xE9 uma combina\xE7\xE3o que oferece:"
+    _alternativas:
+    - "S\xF3 gordura"
+    - "Apenas a\xE7\xFAcar"
+    - "Boas fontes de prote\xEDna e fibras"
+    _indiceCorreto: 2
+    _explicacao: "Juntos, arroz e feij\xE3o formam uma combina\xE7\xE3o nutritiva
+      e tradicional do prato brasileiro."
+  - _enunciado: "Qual op\xE7\xE3o tem mais fibras?"
+    _alternativas:
+    - "P\xE3o integral"
+    - "P\xE3o branco"
+    - Bolo de chocolate
+    _indiceCorreto: 0
+    _explicacao: "Alimentos integrais mant\xEAm a casca do gr\xE3o, onde ficam mais
+      fibras."

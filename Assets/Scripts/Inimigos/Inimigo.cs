@@ -3,27 +3,47 @@ using System;
 
 // Classe base de todo inimigo do jogo (nuvens de maus hábitos).
 // Persegue o cidadão vivo mais próximo (recalculado periodicamente,
-// não todo frame); ao alcançá-lo, causa dano à energia da cidade.
-// O cálculo do vetor de movimento é virtual — cada subclasse pode
-// sobrescrever para ter um padrão de movimento único.
-public abstract class Inimigo : MonoBehaviour, IDanificavel
+// não todo frame); ao alcançá-lo, contamina o cidadão (tira saúde dele).
+// Ao ser derrotado por tiro, dá pontos e pode soltar um power-up.
+// Movimento, recompensa e reação à derrota são virtuais — cada
+// subclasse pode ter seu próprio padrão e habilidade.
+public abstract class Inimigo : MonoBehaviour, IDanificavel, IAlvoDaMira
 {
     protected virtual float Velocidade => 3f;
     protected virtual int DanoAoAlcancarAlvo => 10;
     protected virtual float AmplitudeOscilacao => 0.6f;
+    protected virtual int PontosAoDerrotar => 100;
 
     [SerializeField] private float _intervaloBuscaAlvo = 0.5f;
     protected int _vida = 1;
 
     protected Transform _alvo;
+    private Cidadao _cidadaoAlvo;
     private float _proximaBusca;
     private bool _jaNotificouMorte = false;
     protected float _deslocamentoAleatorio;
     protected float _velocidadeOscilacao;
     private float _alturaFixa;
+    private float _multiplicadorDeVelocidade = 1f;
 
     public abstract TipoMunicao Fraqueza { get; }
+    public bool AceitaTiro => true;
+    public bool IndicaMunicao => true;
+    public TipoMunicao MunicaoIndicada => Fraqueza;
     public event Action AoMorrer;
+    // Disparado quando este inimigo cria outro (ex: hambúrguer que se divide),
+    // para o GeradorDeInimigos contar o novo inimigo na onda.
+    public event Action<Inimigo> AoGerarFilhote;
+
+    protected float VelocidadeAtual => Velocidade * _multiplicadorDeVelocidade;
+    protected float MultiplicadorDeVelocidade => _multiplicadorDeVelocidade;
+    protected Cidadao CidadaoAlvo => _cidadaoAlvo;
+    protected bool EstaMorto => _jaNotificouMorte;
+
+    // Pontos de extensão: o hambúrguer que carrega um cidadão continua se
+    // movendo sem alvo e não "alcança" ninguém enquanto foge.
+    protected virtual bool PodeSeMover => _alvo != null;
+    protected virtual bool PodeAlcancarAlvo => true;
 
     protected virtual void Awake()
     {
@@ -38,19 +58,27 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
 
     protected virtual void Update()
     {
+        if (_jaNotificouMorte) return;
+
         AtualizarAlvoPeriodicamente();
 
-        if (_alvo == null) return;
+        if (!PodeSeMover) return;
 
         AplicarMovimento();
-        AplicarAlturaFinal();
-        transform.position = GerenciadorDeRua.Instancia.RestringirPosicao(transform.position);
+        if (_jaNotificouMorte) return;
 
-        if (DistanciaHorizontalAteAlvo() < 1f)
+        AplicarAlturaFinal();
+        transform.position = GerenciadorDeRua.Instancia.RestringirPosicaoDeInimigo(transform.position);
+
+        if (_alvo != null && PodeAlcancarAlvo && DistanciaHorizontalAteAlvo() < 1f)
         {
-            GerenciadorDeJogo.Instancia.ReceberDanoNaCidade(DanoAoAlcancarAlvo);
-            NotificarMorteEDestruir();
+            AoAlcancarAlvo();
         }
+    }
+
+    public void AplicarMultiplicadorDeVelocidade(float multiplicador)
+    {
+        _multiplicadorDeVelocidade = Mathf.Max(0.1f, multiplicador);
     }
 
     // Ponto de extensão principal: calcula e aplica o deslocamento deste
@@ -61,7 +89,7 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
         Vector3 lateral = Vector3.Cross(Vector3.up, direcaoAoAlvo);
         float oscilacao = Mathf.Sin(Time.time * _velocidadeOscilacao + _deslocamentoAleatorio) * AmplitudeOscilacao;
 
-        Vector3 movimento = (direcaoAoAlvo * Velocidade) + (lateral * oscilacao);
+        Vector3 movimento = (direcaoAoAlvo * VelocidadeAtual) + (lateral * oscilacao);
         transform.position += movimento * Time.deltaTime;
     }
 
@@ -73,6 +101,15 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
         Vector3 posicao = transform.position;
         posicao.y = _alturaFixa;
         transform.position = posicao;
+    }
+
+    // Padrão: contamina o cidadão, quebra o combo do jogador e some.
+    // O chefão sobrescreve para não "morrer" ao encostar num cidadão.
+    protected virtual void AoAlcancarAlvo()
+    {
+        _cidadaoAlvo.ReceberAtaque(DanoAoAlcancarAlvo, Fraqueza);
+        GerenciadorDePontuacao.Instancia.RegistrarErro();
+        NotificarMorteEDestruir();
     }
 
     protected float AlturaFixa => _alturaFixa;
@@ -90,30 +127,74 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel
         return Vector3.Distance(posicaoAtualSemAltura, posicaoAlvoSemAltura);
     }
 
+    // Busca de novo antes da hora se o alvo atual desmaiou ou foi levado.
     private void AtualizarAlvoPeriodicamente()
     {
-        if (Time.time < _proximaBusca) return;
+        bool alvoInvalido = _cidadaoAlvo == null || !_cidadaoAlvo.PodeSerAlvo;
+        if (Time.time < _proximaBusca && !alvoInvalido) return;
 
-        _alvo = GerenciadorDeCidadaos.Instancia.ObterCidadaoMaisProximo(transform.position);
+        _cidadaoAlvo = GerenciadorDeCidadaos.Instancia.ObterCidadaoMaisProximo(transform.position);
+        _alvo = _cidadaoAlvo != null ? _cidadaoAlvo.transform : null;
         _proximaBusca = Time.time + _intervaloBuscaAlvo;
+    }
+
+    // A munição "acerta" se for a fraqueza deste inimigo ou se o
+    // power-up de munição coringa estiver ativo.
+    protected bool EhFraqueza(TipoMunicao municaoUsada)
+    {
+        return municaoUsada == Fraqueza || GerenciadorDePowerUps.Instancia.MunicaoCoringaAtiva;
     }
 
     public virtual void ReceberDano(TipoMunicao municaoUsada)
     {
-        if (municaoUsada == Fraqueza)
-        {
-            _vida--;
-            GerenciadorDeAudio.Instancia.TocarSomAcerto();
-        }
-        else
+        if (!EhFraqueza(municaoUsada))
         {
             GerenciadorDeAudio.Instancia.TocarSomErro();
+            GerenciadorDePontuacao.Instancia.RegistrarErro();
+            return;
         }
+
+        _vida--;
+        GerenciadorDeAudio.Instancia.TocarSomAcerto();
+        GerenciadorDePontuacao.Instancia.RegistrarAcerto();
 
         if (_vida <= 0)
         {
-            NotificarMorteEDestruir();
+            SerDerrotadoPorTiro();
         }
+    }
+
+    // Atingido pelo especial (Onda Saudável): ignora fraqueza e some na
+    // hora, sem se dividir nem soltar item. O chefão sobrescreve (só perde vida).
+    public virtual void ReceberEspecial()
+    {
+        if (_jaNotificouMorte) return;
+        ComemorarAbate(1f);
+        NotificarMorteEDestruir();
+    }
+
+    protected virtual void SerDerrotadoPorTiro()
+    {
+        ComemorarAbate(1f);
+        GerenciadorDePowerUps.Instancia.TentarDropar(transform.position);
+        NotificarMorteEDestruir();
+    }
+
+    // Pontos + explosão na cor da fraqueza + "+pontos" flutuando no ar.
+    protected void ComemorarAbate(float escalaDaExplosao)
+    {
+        int pontos = GerenciadorDePontuacao.Instancia.RegistrarAbate(PontosAoDerrotar);
+        GerenciadorDeEfeitos.Instancia.CriarExplosao(transform.position, CoresDeMunicao.Obter(Fraqueza), escalaDaExplosao);
+        GerenciadorDeEfeitos.Instancia.MostrarPontos(transform.position, pontos, GerenciadorDePontuacao.Instancia.Multiplicador);
+
+        // Explosão grande = chefão.
+        if (escalaDaExplosao >= 2f) GerenciadorDeAudio.Instancia.TocarSomChefaoDerrotado();
+        else GerenciadorDeAudio.Instancia.TocarSomInimigoDerrotado();
+    }
+
+    protected void NotificarFilhote(Inimigo filhote)
+    {
+        AoGerarFilhote?.Invoke(filhote);
     }
 
     protected void NotificarMorteEDestruir()

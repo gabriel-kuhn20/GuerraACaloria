@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8190cfca1324a72895959b45d8a64d1, type: 3}
+  m_Name: Fase1
+  m_EditorClassIdentifier: Assembly-CSharp::ConfiguracaoDeFase
+  _nome: "A Invas\xE3o Come\xE7a"
+  _dicaSaudavel: "Beber \xE1gua ao longo do dia mant\xE9m o corpo funcionando bem.
+    Use a muni\xE7\xE3o certa contra cada inimigo!"
+  _ondas:
+  - {fileID: 11400000, guid: b7946ef3946a4e248a28c877880eb809, type: 2}
+  - {fileID: 11400000, guid: af34ddf6d31dc85498ece5407c3ef2e7, type: 2}
+  - {fileID: 11400000, guid: e67b4ef39ea951b41ac927c3cfe8dcc2, type: 2}
+  _prefabsDeInimigo: []
+  _temChefao: 1
+  _chefao: {fileID: 11400000, guid: 435b6350a32eaef4496223fc5d18a3ed, type: 2}
+  _vidaDoChefao: 30
+  _habilidadesDoChefao: 1
+  _energiaRecuperadaAoIniciar: 0
+  _musica: {fileID: 8300000, guid: 3933406bf21da744d8e089852805f006, type: 3}
