@@ -8,9 +8,8 @@ using UnityEngine.SceneManagement;
 // Ferramenta de editor (não vai para o build): define o level design das
 // 4 fases sobre a avenida principal da cidade (X ≈ -0.4) e gera as cenas
 // Fase2, Fase3 e Fase4 a partir da SampleScene (Fase 1). Cada fase usa um
-// trecho diferente da avenida, com entradas de inimigos, barricadas,
-// obstáculos e iluminação próprios. Toda ponta/abertura da área jogável
-// recebe uma barreira visível (nada de parede invisível).
+// trecho diferente da avenida, com entradas de inimigos, obstáculos
+// e iluminação próprios.
 // Pode ser rodada de novo sempre que a SampleScene mudar.
 // Menu: GuerraACaloria > Gerar Cenas das Fases.
 public static class CriadorDeCenasDeFase
@@ -34,11 +33,6 @@ public static class CriadorDeCenasDeFase
     private const float XFimDoBraco = -22.4f;
 
     private const float RecuoDoSpawn = 4.5f;
-    private const float DistanciaDaBarreira = 1.3f;
-    private const float ComprimentoDoCarro = 4.2f;
-
-    private static readonly string[] CarrosDaBarricada = { "Van", "Car_06", "Car_13", "Car_19" };
-    private static readonly string[] CarrosDoFechamento = { "Car_16", "Futuristic_Car_1", "Car_06" };
 
     private enum Origem { PontaFinal, PontaInicial, AmbasAsPontas }
 
@@ -499,18 +493,6 @@ public static class CriadorDeCenasDeFase
         MedirCidade();
         Transform pai = new GameObject(NomeDecoracao).transform;
 
-        // Pontas: barricada onde inimigos entram, fechamento onde não entram.
-        CriarBarreiraTransversal(fase.ZInicio - DistanciaDaBarreira, fase.InimigosNoInicio ? CarrosDaBarricada : CarrosDoFechamento, pai);
-        CriarBarreiraTransversal(fase.ZFim + DistanciaDaBarreira, fase.InimigosNoFim ? CarrosDaBarricada : CarrosDoFechamento, pai);
-
-        // Boca da transversal: sempre fechada; se for entrada, os inimigos
-        // nascem atrás desses carros (o vão no meio é por onde eles passam).
-        if (fase.TemTransversal)
-        {
-            bool temBraco = fase.BracoNaTransversal;
-            CriarBarreiraLateral(temBraco ? XFimDoBraco - DistanciaDaBarreira : XAvenida - LarguraAvenida / 2f - DistanciaDaBarreira, pai);
-        }
-
         foreach (Obstaculo obstaculo in fase.Obstaculos)
         {
             float altura = obstaculo.NoAsfalto ? _alturaDoAsfalto : _alturaDaCalcada;
@@ -521,33 +503,6 @@ public static class CriadorDeCenasDeFase
             GameObject criado = Instanciar($"{obstaculo.Prefab}.prefab", posicao, obstaculo.Giro, pai);
             if (criado != null && obstaculo.AlturaAlvo > 0f) AjustarAltura(criado, obstaculo.AlturaAlvo, altura);
         }
-    }
-
-    // 3 carros atravessados (comprimento ao longo de X) cobrindo a largura da rua.
-    private static void CriarBarreiraTransversal(float z, string[] modelos, Transform pai)
-    {
-        for (int i = 0; i < 3; i++)
-        {
-            float x = XAvenida + (i - 1) * ComprimentoDoCarro;
-            float giro = 90f + Random.Range(-8f, 8f);
-            string modelo = modelos[Random.Range(0, modelos.Length)];
-            Vector3 posicao = new Vector3(x, _alturaDoAsfalto, z + Random.Range(-0.3f, 0.3f));
-            Instanciar($"{PastaCarros}{modelo}.prefab", posicao, giro, pai);
-            Ocupar(posicao, ComprimentoDoCarro / 2f);
-        }
-    }
-
-    // 2 carros alinhados com a avenida atravessando a rua transversal
-    // (na boca dela ou no fim do braço), com um vão no meio.
-    private static void CriarBarreiraLateral(float x, Transform pai)
-    {
-        float deslocamento = MeiaLarguraTransversal - ComprimentoDoCarro / 2f - 0.5f;
-        Vector3 primeiro = new Vector3(x, _alturaDoAsfalto, ZTransversal - deslocamento);
-        Vector3 segundo = new Vector3(x, _alturaDoAsfalto, ZTransversal + deslocamento);
-        Instanciar($"{PastaCarros}Van.prefab", primeiro, Random.Range(-6f, 6f), pai);
-        Instanciar($"{PastaCarros}Car_13.prefab", segundo, 180f + Random.Range(-6f, 6f), pai);
-        Ocupar(primeiro, ComprimentoDoCarro / 2f);
-        Ocupar(segundo, ComprimentoDoCarro / 2f);
     }
 
     // Escala uniforme para que o objeto fique com a altura desejada
