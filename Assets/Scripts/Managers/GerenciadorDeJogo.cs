@@ -50,7 +50,7 @@ public class GerenciadorDeJogo : MonoBehaviour
         }
     }
 
-    // Cura vinda de itens, quiz e eventos (vai para os cidadãos mais fracos).
+    // Cura vinda de itens e eventos (vai para os cidadãos mais fracos).
     public void RestaurarEnergia(int quantidade)
     {
         if (_jogoAcabou || quantidade <= 0) return;

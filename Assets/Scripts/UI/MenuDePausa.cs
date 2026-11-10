@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 // Menu de pausa da partida (tecla Esc): continuar, reiniciar a fase,
 // abrir as opções ou voltar ao menu principal. Pausa congelando o tempo
-// (Time.timeScale = 0). Não abre durante o quiz nem depois do fim de jogo.
+// (Time.timeScale = 0). Não abre durante a escolha de melhoria nem depois do fim de jogo.
 public class MenuDePausa : MonoBehaviour
 {
     [SerializeField] private GameObject _painelPausa;
@@ -38,7 +38,6 @@ public class MenuDePausa : MonoBehaviour
     private bool PodePausar()
     {
         if (GerenciadorDeJogo.Instancia.JogoAcabou) return false;
-        if (GerenciadorDeQuiz.Instancia != null && GerenciadorDeQuiz.Instancia.QuizAberto) return false;
         if (GerenciadorDeMelhorias.Instancia != null && GerenciadorDeMelhorias.Instancia.EscolhaAberta) return false;
         return true;
     }

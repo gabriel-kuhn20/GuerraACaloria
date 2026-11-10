@@ -235,7 +235,7 @@ public class Cidadao : MonoBehaviour, IDanificavel, IAlvoDaMira
         Curar(Mathf.RoundToInt(_curaPorTiro * GerenciadorDeMelhorias.Atributos.MultiplicadorDeCura), peloJogador: true);
     }
 
-    // Cura vinda do jogador (tiro) ou de itens/quiz (peloJogador = false).
+    // Cura vinda do jogador (tiro) ou de itens/eventos (peloJogador = false).
     public void Curar(int quantidade, bool peloJogador)
     {
         if (EstaSendoCarregado || quantidade <= 0) return;

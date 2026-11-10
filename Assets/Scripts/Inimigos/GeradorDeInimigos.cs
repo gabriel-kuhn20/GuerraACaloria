@@ -263,17 +263,9 @@ public class GeradorDeInimigos : MonoBehaviour
         StartCoroutine(TrocarDeCena());
     }
 
-    // Entre uma cena e outra roda o quiz de nutrição (se houver na cena).
     private IEnumerator TrocarDeCena()
     {
         yield return new WaitForSeconds(_esperaAntesDeTrocarCena);
-
-        if (GerenciadorDeQuiz.Instancia == null)
-        {
-            GerenciadorDeJogo.Instancia.AvancarParaCena(_proximaCena);
-            yield break;
-        }
-
-        GerenciadorDeQuiz.Instancia.IniciarQuiz(() => GerenciadorDeJogo.Instancia.AvancarParaCena(_proximaCena));
+        GerenciadorDeJogo.Instancia.AvancarParaCena(_proximaCena);
     }
 }

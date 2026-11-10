@@ -76,7 +76,7 @@ public class GerenciadorDeMelhorias : MonoBehaviour
 
     public int Nivel(Melhoria melhoria) => _niveis.TryGetValue(melhoria.Id, out int nivel) ? nivel : 0;
 
-    // Só oferece com o jogo rodando (não durante pausa, quiz ou fim de jogo).
+    // Só oferece com o jogo rodando (não durante pausa ou fim de jogo).
     private bool PodeOferecer()
     {
         if (_painel == null || Time.timeScale == 0f) return false;

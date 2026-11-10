@@ -9,8 +9,8 @@ using static UtilitariosDeUIEditor;
 
 // Ferramenta de editor (não vai para o build): nas cenas de jogo
 // (SampleScene e Fase2–4) remonta o Canvas do HUD, liga todas as
-// referências do UIManager, monta menu de pausa, opções e quiz, garante
-// os managers (pontuação, power-ups, efeitos, quiz), o tutorial da Fase 1,
+// referências do UIManager, monta menu de pausa e opções, garante
+// os managers (pontuação, power-ups, efeitos), o tutorial da Fase 1,
 // (re)cria os prefabs de power-up, gera os ícones das munições a partir
 // dos modelos reais do projétil e aplica a fonte Fredoka em todo o HUD.
 // Pode ser rodada de novo sem duplicar.
@@ -53,7 +53,6 @@ public static class CriadorDeHUD
         EditorSceneManager.OpenScene(Cenas[0]);
         GameObject[] prefabsDePowerUp = CriarPrefabsDePowerUp();
         CriarArremessoDoChefao();
-        BancoDePerguntas banco = DadosIniciaisDoQuiz.CriarSeNaoExistir();
         CriadorDeChefoes.GarantirChefoes();
         ConfiguradorDeAudio.ConfigurarMusicasDasFases();
         Sprite[] iconesDeMunicao = GerarIconesDeMunicao();
@@ -63,7 +62,7 @@ public static class CriadorDeHUD
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(caminho) == null) continue;
 
             Scene cena = EditorSceneManager.OpenScene(caminho);
-            GarantirManagers(prefabsDePowerUp, banco);
+            GarantirManagers(prefabsDePowerUp);
             MontarNaCenaAberta(ehPrimeiraCena: caminho == Cenas[0], iconesDeMunicao);
             EditorSceneManager.MarkSceneDirty(cena);
             EditorSceneManager.SaveScene(cena);
@@ -198,7 +197,7 @@ public static class CriadorDeHUD
         return limites;
     }
 
-    private static void GarantirManagers(GameObject[] prefabsDePowerUp, BancoDePerguntas banco)
+    private static void GarantirManagers(GameObject[] prefabsDePowerUp)
     {
         // Vida do Agente fica no próprio objeto do jogador.
         MovimentoJogador jogador = Object.FindFirstObjectByType<MovimentoJogador>();
@@ -217,11 +216,10 @@ public static class CriadorDeHUD
 
         ConfiguradorDeAudio.Configurar(Object.FindFirstObjectByType<GerenciadorDeAudio>());
 
-        GerenciadorDeQuiz quiz = Object.FindFirstObjectByType<GerenciadorDeQuiz>();
-        if (quiz == null) quiz = CriarManager<GerenciadorDeQuiz>("GerenciadorDeQuiz", pastaDosManagers);
-        SerializedObject dadosDoQuiz = new SerializedObject(quiz);
-        dadosDoQuiz.FindProperty("_banco").objectReferenceValue = banco;
-        dadosDoQuiz.ApplyModifiedPropertiesWithoutUndo();
+        // O quiz entre fases foi removido: apaga o manager antigo das cenas
+        // (busca por nome porque o script não existe mais).
+        Transform quizAntigo = pastaDosManagers.Find("GerenciadorDeQuiz");
+        if (quizAntigo != null) Object.DestroyImmediate(quizAntigo.gameObject);
 
         if (Object.FindFirstObjectByType<GerenciadorDeEspecial>() == null)
         {
@@ -368,7 +366,6 @@ public static class CriadorDeHUD
 
         CriarIndicadoresDeCidadaos(hud);
         CriarMenuDePausa(canvas);
-        LigarQuiz(CriarPainelDoQuiz(canvas));
         LigarMelhorias(CriarPainelDeMelhorias(canvas));
         AplicarFonte(canvas);
         ConfigurarTutorial(ui, ehPrimeiraCena);
@@ -427,52 +424,6 @@ public static class CriadorDeHUD
         dados.FindProperty("_painelPausa").objectReferenceValue = janela.gameObject;
         dados.FindProperty("_painelOpcoes").objectReferenceValue = opcoes;
         dados.ApplyModifiedPropertiesWithoutUndo();
-    }
-
-    private static PainelDoQuiz CriarPainelDoQuiz(Transform canvas)
-    {
-        RectTransform controle = CriarUI("Quiz", canvas);
-        Esticar(controle);
-        PainelDoQuiz painel = controle.gameObject.AddComponent<PainelDoQuiz>();
-
-        RectTransform janela = CriarJanela(controle, "PainelQuiz", "QUIZ SAUDÁVEL", new Vector2(1400f, 860f), out RectTransform caixa);
-
-        TextMeshProUGUI progresso = CriarTexto(caixa, "Progresso", "", 30f, new Color(1f, 1f, 1f, 0.7f), new Vector2(0f, 290f), new Vector2(1200f, 50f));
-        TextMeshProUGUI pergunta = CriarTexto(caixa, "Pergunta", "", 44f, Color.white, new Vector2(0f, 190f), new Vector2(1250f, 150f));
-        pergunta.fontStyle = FontStyles.Bold;
-
-        Button[] botoes = new Button[3];
-        TextMeshProUGUI[] textos = new TextMeshProUGUI[3];
-        for (int i = 0; i < 3; i++)
-        {
-            botoes[i] = CriarBotaoNaPosicao(caixa, $"Alternativa{i}", "", CorAzulPadrao, null,
-                new Vector2(0f, 50f - i * 110f), new Vector2(1200f, 92f), 32f);
-            ColorBlock cores = botoes[i].colors;
-            cores.disabledColor = Color.white;
-            botoes[i].colors = cores;
-            textos[i] = botoes[i].GetComponentInChildren<TextMeshProUGUI>();
-        }
-
-        TextMeshProUGUI feedback = CriarTexto(caixa, "Feedback", "", 36f, Color.white, new Vector2(0f, -310f), new Vector2(1250f, 140f));
-
-        SerializedObject dados = new SerializedObject(painel);
-        dados.FindProperty("_raiz").objectReferenceValue = janela.gameObject;
-        dados.FindProperty("_textoProgresso").objectReferenceValue = progresso;
-        dados.FindProperty("_textoPergunta").objectReferenceValue = pergunta;
-        dados.FindProperty("_textoFeedback").objectReferenceValue = feedback;
-        SerializedProperty listaBotoes = dados.FindProperty("_botoes");
-        SerializedProperty listaTextos = dados.FindProperty("_textosDosBotoes");
-        listaBotoes.arraySize = 3;
-        listaTextos.arraySize = 3;
-        for (int i = 0; i < 3; i++)
-        {
-            listaBotoes.GetArrayElementAtIndex(i).objectReferenceValue = botoes[i];
-            listaTextos.GetArrayElementAtIndex(i).objectReferenceValue = textos[i];
-        }
-        dados.ApplyModifiedPropertiesWithoutUndo();
-
-        janela.gameObject.SetActive(false);
-        return painel;
     }
 
     // Centro inferior, acima das munições: barra do especial com o texto por cima.
@@ -591,14 +542,6 @@ public static class CriadorDeHUD
     {
         GerenciadorDeMelhorias melhorias = Object.FindFirstObjectByType<GerenciadorDeMelhorias>();
         SerializedObject dados = new SerializedObject(melhorias);
-        dados.FindProperty("_painel").objectReferenceValue = painel;
-        dados.ApplyModifiedPropertiesWithoutUndo();
-    }
-
-    private static void LigarQuiz(PainelDoQuiz painel)
-    {
-        GerenciadorDeQuiz quiz = Object.FindFirstObjectByType<GerenciadorDeQuiz>();
-        SerializedObject dados = new SerializedObject(quiz);
         dados.FindProperty("_painel").objectReferenceValue = painel;
         dados.ApplyModifiedPropertiesWithoutUndo();
     }
