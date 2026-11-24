@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -84,6 +85,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject _painelTransicaoFase;
     [SerializeField] private TextMeshProUGUI _textoTransicaoFase;
     [SerializeField] private float _duracaoTransicaoFase = 4f;
+    [Tooltip("Segundos da contagem dos pontos na tela final.")]
+    [SerializeField] private float _duracaoDaContagem = 1.4f;
 
     private int _numeroDaFase = 1;
     private string _nomeDaFase = "";
@@ -453,42 +456,80 @@ public class UIManager : MonoBehaviour
         EsconderTransicaoDeFase();
         EsconderAviso();
 
-        string resultado = MontarTextoDeResultado();
-        _textoResultadoGameOver.text = resultado;
-        _textoResultadoVitoria.text = resultado;
+        bool vitoria = telaParaMostrar == _telaVitoria;
+        TextMeshProUGUI textoResultado = vitoria ? _textoResultadoVitoria : _textoResultadoGameOver;
+        PrepararCaixaDeResultado(textoResultado);
         telaParaMostrar.SetActive(true);
+        StartCoroutine(AnimarResultado(textoResultado, vitoria));
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         Time.timeScale = 0f;
     }
 
-    private string MontarTextoDeResultado()
+    // A caixa de resultado foi criada para 2 linhas; na vitória mostra 4.
+    private static void PrepararCaixaDeResultado(TextMeshProUGUI texto)
+    {
+        texto.rectTransform.anchoredPosition = new Vector2(0f, -20f);
+        texto.rectTransform.sizeDelta = new Vector2(1400f, 200f);
+        texto.enableAutoSizing = true;
+        texto.fontSizeMin = 24f;
+        texto.fontSizeMax = 52f;
+    }
+
+    // Conta os pontos de 0 até o total com desaceleração no fim.
+    // Tempo real (unscaled): o jogo está pausado nesta tela.
+    private IEnumerator AnimarResultado(TextMeshProUGUI texto, bool vitoria)
+    {
+        int pontosFinais = GerenciadorDePontuacao.Instancia.Pontos;
+        float tempo = 0f;
+        while (tempo < _duracaoDaContagem)
+        {
+            tempo += Time.unscaledDeltaTime;
+            float progresso = 1f - Mathf.Pow(1f - Mathf.Clamp01(tempo / _duracaoDaContagem), 3f);
+            texto.text = MontarTextoDeResultado(Mathf.RoundToInt(pontosFinais * progresso), vitoria);
+            yield return null;
+        }
+        texto.text = MontarTextoDeResultado(pontosFinais, vitoria);
+    }
+
+    private string MontarTextoDeResultado(int pontosMostrados, bool vitoria)
     {
         GerenciadorDePontuacao pontuacao = GerenciadorDePontuacao.Instancia;
         string recorde = pontuacao.BateuRecorde
             ? "<color=#FFD240>NOVO RECORDE!</color>"
             : $"RECORDE  {GerenciadorDePontuacao.Recorde:N0}";
-        return $"PONTOS  {pontuacao.Pontos:N0}\n<size=70%>{recorde}</size>";
+
+        string texto = $"PONTOS  {pontosMostrados:N0}\n<size=60%>{recorde}</size>";
+        if (!vitoria) return texto;
+
+        // Saúde da cidade é levada de uma fase para a outra: vale a campanha toda.
+        GerenciadorDeJogo jogo = GerenciadorDeJogo.Instancia;
+        int saude = jogo.EnergiaMaxima > 0 ? Mathf.RoundToInt(100f * jogo.EnergiaAtual / jogo.EnergiaMaxima) : 0;
+        return $"<size=70%>{ClassificarVitoria(saude)}</size>\n{texto}\n<size=45%><color=#CFE8FF>SAÚDE DA CIDADE  {saude}%</color></size>";
+    }
+
+    private static string ClassificarVitoria(int saudeDaCidade)
+    {
+        if (saudeDaCidade >= 80) return "<color=#7CF29A>CIDADE RADIANTE!</color>";
+        if (saudeDaCidade >= 50) return "<color=#FFD240>CIDADE SAUDÁVEL</color>";
+        return "<color=#FF9E5E>CIDADE SALVA POR POUCO</color>";
     }
 
     public void Reiniciar()
     {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        TransicaoDeTela.Instancia.CarregarCena(SceneManager.GetActiveScene().name);
     }
 
     public void ReiniciarCampanha()
     {
-        Time.timeScale = 1f;
         ProgressoDaCampanha.Reiniciar();
-        SceneManager.LoadScene(_nomePrimeiraCena);
+        TransicaoDeTela.Instancia.CarregarCena(_nomePrimeiraCena);
     }
 
     public void VoltarAoMenu()
     {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(_nomeCenaDoMenu);
+        TransicaoDeTela.Instancia.CarregarCena(_nomeCenaDoMenu);
     }
 
     private void ConfigurarUIChefao(ChefaoDeCaloria chefao)

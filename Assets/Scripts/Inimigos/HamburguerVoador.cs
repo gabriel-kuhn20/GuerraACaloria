@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Representa o excesso de gordura/ultraprocessados. Fraqueza: Água.
+// Representa o excesso de gordura/ultraprocessados. Fraqueza: Fruta.
 // Começa pesado e lento, mas acelera progressivamente quanto mais
 // perto fica do alvo. Habilidades: ao ser derrotado por tiro, se divide
 // em dois mini-hambúrgueres (que não se dividem de novo); e às vezes, em
@@ -26,7 +26,7 @@ public class HamburguerVoador : Inimigo
     protected override bool PodeSeMover => _cidadaoCarregado != null || base.PodeSeMover;
     protected override bool PodeAlcancarAlvo => _cidadaoCarregado == null;
 
-    public override TipoMunicao Fraqueza => TipoMunicao.Agua;
+    public override TipoMunicao Fraqueza => TipoMunicao.Fruta;
     protected override float Velocidade => 14f;
     protected override int DanoAoAlcancarAlvo => _ehFilhote ? 8 : 20;
     protected override float AmplitudeOscilacao => 0.4f;

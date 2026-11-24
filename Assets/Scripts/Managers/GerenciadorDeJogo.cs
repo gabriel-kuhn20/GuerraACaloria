@@ -1,6 +1,5 @@
 using UnityEngine;
 using System;
-using UnityEngine.SceneManagement;
 
 // Controla o estado geral da partida: saúde da cidade (soma da saúde dos
 // cidadãos), derrota, vitória e passagem para a cena da próxima fase.
@@ -67,7 +66,7 @@ public class GerenciadorDeJogo : MonoBehaviour
         ProgressoDaCampanha.SalvarFracaoDeSaude(fracao);
         ProgressoDaCampanha.SalvarPontuacao(GerenciadorDePontuacao.Instancia.Pontos);
         if (GerenciadorDeMelhorias.Instancia != null) GerenciadorDeMelhorias.Instancia.SalvarNaCampanha();
-        SceneManager.LoadScene(nomeDaCena);
+        TransicaoDeTela.Instancia.CarregarCena(nomeDaCena);
     }
 
     public void RegistrarVitoria()

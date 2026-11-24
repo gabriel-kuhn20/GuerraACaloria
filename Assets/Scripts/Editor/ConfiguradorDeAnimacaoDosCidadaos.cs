@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 // 1) Liga o loop dos clipes Idle/Walk/Run nos FBX; 2) remonta o
 // ControllerCidadao com um Blend Tree (parado -> andando -> correndo pelo
 // parâmetro "Velocidade"), comemoração (trigger "Comemorar") e desmaio
-// sentado (bool "Desmaiado"); 3) nas cenas de jogo aplica o controller,
+// caindo no chão (bool "Desmaiado", clipe Man_Death); 3) nas cenas de jogo aplica o controller,
 // ajusta as velocidades e coloca a zona dos cidadãos à frente do jogador.
 // Menu: GuerraACaloria > Configurar Cidadãos.
 public static class ConfiguradorDeAnimacaoDosCidadaos
@@ -115,18 +115,19 @@ public static class ConfiguradorDeAnimacaoDosCidadaos
         saida.exitTime = 0.9f;
         saida.duration = 0.25f;
 
-        AnimatorState sentado = maquina.AddState("Desmaiado");
-        sentado.motion = BuscarClipe("Man_Sitting");
+        // Clipe de queda sem loop: o cidadão cai e fica deitado no último quadro.
+        AnimatorState caido = maquina.AddState("Desmaiado");
+        caido.motion = BuscarClipe("Man_Death");
 
-        AnimatorStateTransition desmaiar = maquina.AddAnyStateTransition(sentado);
+        AnimatorStateTransition desmaiar = maquina.AddAnyStateTransition(caido);
         desmaiar.AddCondition(AnimatorConditionMode.If, 0f, "Desmaiado");
-        desmaiar.duration = 0.2f;
+        desmaiar.duration = 0.15f;
         desmaiar.canTransitionToSelf = false;
 
-        AnimatorStateTransition levantar = sentado.AddTransition(locomocao);
+        AnimatorStateTransition levantar = caido.AddTransition(locomocao);
         levantar.AddCondition(AnimatorConditionMode.IfNot, 0f, "Desmaiado");
         levantar.hasExitTime = false;
-        levantar.duration = 0.3f;
+        levantar.duration = 0.45f;
 
         EditorUtility.SetDirty(controller);
         AssetDatabase.SaveAssets();

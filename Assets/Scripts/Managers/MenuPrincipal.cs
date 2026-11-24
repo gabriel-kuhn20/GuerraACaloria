@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using TMPro;
 
 // Controla a cena de menu principal: iniciar a partida (do começo ou
@@ -38,7 +37,7 @@ public class MenuPrincipal : MonoBehaviour
     public void IniciarJogo()
     {
         ProgressoDaCampanha.Reiniciar();
-        SceneManager.LoadScene(_nomeCenaDeJogo);
+        TransicaoDeTela.Instancia.CarregarCena(_nomeCenaDeJogo);
     }
 
     // Começa direto na fase escolhida (1 a 4), com a campanha zerada:
@@ -50,7 +49,7 @@ public class MenuPrincipal : MonoBehaviour
 
         TocarClique();
         ProgressoDaCampanha.Reiniciar();
-        SceneManager.LoadScene(_cenasDasFases[indice]);
+        TransicaoDeTela.Instancia.CarregarCena(_cenasDasFases[indice]);
     }
 
     public void AbrirFases() => AbrirPainel(_painelFases);

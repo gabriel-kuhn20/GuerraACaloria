@@ -91,6 +91,8 @@ public class ChefaoDeCaloria : Inimigo
     protected override int DanoNoAgente => 20;
     protected override float RaioDeContatoComAgente => 2.6f;
     protected override float ForcaDoEmpurraoNoAgente => 2.5f;
+    // O chefão não recua ao encostar: as investidas dele continuam valendo.
+    protected override float DuracaoDoRecuoAposAtacar => 0f;
 
     private bool EstaInvestindo => Time.time < _fimDaInvestida;
     private bool EstaInvulneravel => Time.time < _fimDaInvulnerabilidade;

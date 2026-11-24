@@ -153,9 +153,9 @@ public static class CriadorDeCenasDeFase
             PosicaoJogador = new Vector3(XAvenida, 0f, 38f), GiroJogador = 0f,
             CentroDosCidadaos = new Vector3(XAvenida, 0f, ZTransversal),
             AlterarIluminacao = true,
-            CorLuz = new Color(0.5f, 0.6f, 1f), IntensidadeLuz = 0.35f, RotacaoLuz = new Vector3(40f, 30f, 0f),
-            UsarAmbienteFixo = true, CorAmbiente = new Color(0.12f, 0.14f, 0.25f),
-            Neblina = true, CorNeblina = new Color(0.08f, 0.1f, 0.2f), DensidadeNeblina = 0.02f,
+            CorLuz = new Color(0.55f, 0.65f, 1f), IntensidadeLuz = 0.7f, RotacaoLuz = new Vector3(40f, 30f, 0f),
+            UsarAmbienteFixo = true, CorAmbiente = new Color(0.26f, 0.28f, 0.42f),
+            Neblina = true, CorNeblina = new Color(0.12f, 0.14f, 0.26f), DensidadeNeblina = 0.01f,
             Noturna = true,
         };
         // "Estátuas" gigantes de fast food enfeitando as calçadas do festival.
@@ -217,6 +217,7 @@ public static class CriadorDeCenasDeFase
         if (fase.AlterarIluminacao) ConfigurarIluminacao(fase);
         LiberarAreaJogavel(fase);
         CriarDecoracao(fase);
+        if (fase.Noturna) AcenderPostes(fase);
     }
 
     private static void ConfigurarGerador(int numeroDaFase, string proximaCena)
@@ -327,6 +328,44 @@ public static class CriadorDeCenasDeFase
         GeradorDeInimigos gerador = Object.FindFirstObjectByType<GeradorDeInimigos>();
         Transform ponto = new SerializedObject(gerador).FindProperty("_pontoDeSpawnChefao").objectReferenceValue as Transform;
         if (ponto != null) ponto.position = posicao;
+    }
+
+    // Fase noturna: põe uma luz pontual quente no alto de cada poste
+    // (da cidade e da decoração) perto do trecho jogável.
+    private static void AcenderPostes(Fase fase)
+    {
+        List<Transform> postes = new List<Transform>();
+        GameObject cidade = GameObject.Find(CaminhoDaCidade);
+        GameObject decoracao = GameObject.Find(NomeDecoracao);
+        if (cidade != null) foreach (Transform filho in cidade.transform) postes.Add(filho);
+        if (decoracao != null) foreach (Transform filho in decoracao.transform) postes.Add(filho);
+
+        const float margem = 10f;
+        foreach (Transform poste in postes)
+        {
+            if (!poste.gameObject.activeInHierarchy || !poste.name.StartsWith("Spotlight")) continue;
+            if (poste.position.z < fase.ZInicio - margem || poste.position.z > fase.ZFim + margem) continue;
+            if (poste.Find("LuzDoPoste") != null) continue;
+
+            Light luz = new GameObject("LuzDoPoste").AddComponent<Light>();
+            luz.transform.SetParent(poste, false);
+            luz.transform.position = poste.position + Vector3.up * (AlturaDoTopo(poste) - 0.4f);
+            luz.type = LightType.Point;
+            luz.color = new Color(1f, 0.82f, 0.55f);
+            luz.range = 14f;
+            luz.intensity = 3f;
+            luz.shadows = LightShadows.None;
+        }
+    }
+
+    private static float AlturaDoTopo(Transform objeto)
+    {
+        Renderer[] renderers = objeto.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0) return 4.5f;
+
+        Bounds limites = renderers[0].bounds;
+        foreach (Renderer r in renderers) limites.Encapsulate(r.bounds);
+        return limites.max.y - objeto.position.y;
     }
 
     private static void ConfigurarIluminacao(Fase fase)

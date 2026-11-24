@@ -2,7 +2,7 @@ using UnityEngine;
 
 // Cidadão da praça: é quem o jogador protege. Tem saúde própria; quando um
 // inimigo o alcança ele fica contaminado (mais lento, barrinha de saúde
-// com a cor da munição que o cura) e, se a saúde zerar, desmaia sentado
+// com a cor da munição que o cura) e, se a saúde zerar, desmaia e cai
 // no chão. O jogador cura atirando a munição certa nele. Hambúrgueres
 // podem sequestrá-lo. A saúde da cidade é a soma da saúde dos cidadãos.
 // Comportamento por máquina de estados: passeia, para, foge, comemora e,

@@ -21,6 +21,10 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel, IAlvoDaMira
     // Chance (no nascimento) de ser agressivo: persegue o agente se ele estiver perto.
     protected virtual float ChanceDeSerAgressivo => 0.25f;
     protected virtual float RaioDeAgressao => 9f;
+    // Depois de encostar no agente, o inimigo se afasta por um instante e
+    // passa um tempo sem persegui-lo (evita ficar "grudado" causando dano).
+    protected virtual float DuracaoDoRecuoAposAtacar => 0.7f;
+    protected virtual float TempoSemPerseguirAgenteAposAtacar => 3f;
 
     [SerializeField] private float _intervaloBuscaAlvo = 0.5f;
     protected int _vida = 1;
@@ -36,6 +40,8 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel, IAlvoDaMira
     private bool _agressivo;
     private bool _perseguindoAgente;
     private float _proximoContatoComAgente;
+    private float _fimDoRecuo;
+    private float _fimDaPausaNaPerseguicao;
 
     public abstract TipoMunicao Fraqueza { get; }
     public bool AceitaTiro => true;
@@ -74,6 +80,14 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel, IAlvoDaMira
         if (_jaNotificouMorte) return;
 
         AtualizarAlvoPeriodicamente();
+
+        if (Time.time < _fimDoRecuo)
+        {
+            RecuarDoAgente();
+            AplicarAlturaFinal();
+            transform.position = GerenciadorDeRua.Instancia.RestringirPosicaoDeInimigo(transform.position);
+            return;
+        }
 
         if (!PodeSeMover) return;
 
@@ -166,6 +180,7 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel, IAlvoDaMira
     {
         VidaDoAgente agente = VidaDoAgente.Instancia;
         if (!_agressivo || agente == null || agente.EstaNocauteado) return false;
+        if (Time.time < _fimDaPausaNaPerseguicao) return false;
         return DistanciaHorizontalAte(agente.transform.position) < RaioDeAgressao;
     }
 
@@ -178,6 +193,24 @@ public abstract class Inimigo : MonoBehaviour, IDanificavel, IAlvoDaMira
 
         agente.ReceberDano(DanoNoAgente, transform.position, ForcaDoEmpurraoNoAgente);
         _proximoContatoComAgente = Time.time + 1.2f;
+
+        // Recua e volta a mirar nos cidadãos por um tempo.
+        _fimDoRecuo = Time.time + DuracaoDoRecuoAposAtacar;
+        _fimDaPausaNaPerseguicao = Time.time + TempoSemPerseguirAgenteAposAtacar;
+        _perseguindoAgente = false;
+        _proximaBusca = 0f;
+    }
+
+    private void RecuarDoAgente()
+    {
+        VidaDoAgente agente = VidaDoAgente.Instancia;
+        if (agente == null) return;
+
+        Vector3 afastar = transform.position - agente.transform.position;
+        afastar.y = 0f;
+        if (afastar.sqrMagnitude < 0.001f) afastar = -transform.forward;
+
+        transform.position += afastar.normalized * VelocidadeAtual * 0.6f * Time.deltaTime;
     }
 
     protected float DistanciaHorizontalAte(Vector3 posicao)

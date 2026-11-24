@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Representa o excesso de açúcar. Fraqueza: Fruta.
+// Representa o excesso de açúcar. Fraqueza: Água.
 // Movimento em zigue-zague acentuado e caótico. Habilidade: de tempos
 // em tempos dá uma arrancada (pico de açúcar) — corre bem mais rápido
 // e quase em linha reta por um instante.
@@ -14,7 +14,7 @@ public class RefrigeranteZumbi : Inimigo
     private float _proximaArrancada;
     private float _fimDaArrancada;
 
-    public override TipoMunicao Fraqueza => TipoMunicao.Fruta;
+    public override TipoMunicao Fraqueza => TipoMunicao.Agua;
     protected override float Velocidade => 16f;
     protected override int DanoAoAlcancarAlvo => 12;
     protected override float AmplitudeOscilacao => 1.5f;

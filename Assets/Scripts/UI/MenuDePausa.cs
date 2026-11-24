@@ -64,14 +64,12 @@ public class MenuDePausa : MonoBehaviour
 
     public void ReiniciarFase()
     {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        TransicaoDeTela.Instancia.CarregarCena(SceneManager.GetActiveScene().name);
     }
 
     public void VoltarAoMenu()
     {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(_nomeCenaDoMenu);
+        TransicaoDeTela.Instancia.CarregarCena(_nomeCenaDoMenu);
     }
 
     public void AbrirOpcoes()
